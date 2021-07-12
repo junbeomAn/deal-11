@@ -2,9 +2,13 @@
 
 <br>
 
-## 김지용
+## 팀원 정보
+
+### [김지용](https://github.com/jiyong1)
 
 <br>
 
-## 안준범
+### [안준범](https://github.com/junbeomAn)
+
+
 
