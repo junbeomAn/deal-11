@@ -11,14 +11,13 @@ dotenv.config();
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 
+const dbInit = require('./db/init');
+
 const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.engine('html', require('ejs').renderFile)
-app.set('view engine', 'html');
+dbInit();
 
 app.use(logger('dev'));
 app.use(express.json());
