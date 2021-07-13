@@ -12,7 +12,7 @@ export default class Componet {
 
   // state 정의
   setup () {};
-  // render 후 실행되는 함수
+  // render 후 실행되는 함수 (자식 객체 생성하는 코드가 필요)
   mounted () {};
   // render 이전에 template literal로 string 리턴해주는 함수
   template () { return '' };
@@ -21,12 +21,18 @@ export default class Componet {
     this.$target.innerHTML = this.template();
     this.mounted();
   }
+  // render를 해야하는가?
+  shouldComponentUpdate (prevState, nextState) {
+    return true;
+  }
   // 이벤트 등록 (addEvent 사용)
   setEvent () {};
   // state 변경되면 render 다시
   setState (newState) {
+    const prevState = this.$state;
     this.$state = { ...this.$state, ...newState };
-    this.render();
+    
+    if (this.shouldComponentUpdate(prevState, this.$state)) this.render();
   }
   // event add 하기
   addEvent (eventType, selector, callback) {
