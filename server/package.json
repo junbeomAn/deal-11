@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon app.js",
-    "test": "mocha $(find ./test/ -name \"*.spec.js\")"
+    "test": "mocha $(find ./test/ -name \"*.spec.js\")",
+    "dbcreate": "node db/create.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
