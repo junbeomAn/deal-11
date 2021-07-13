@@ -1,21 +1,25 @@
 
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const config = require('./config');
 const env = process.env.NODE_ENV || "development";
 const dbname = config[env].database
 
-const con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "0rladlrtmd"
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'root',
+  password: "0rladlrtmd",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-con.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-  con.query(`CREATE DATABASE ${dbname}`, function (err, result) {
-    if (err) throw err;
-    console.log("Database created");
-    process.exit();
-  });
-});
+pool.query(`CREATE DATABASE ${dbname}`)
+.then(_ => {
+  console.log('DB Created!');
+})
+.catch(err => {
+  console.error(err);
+})
+.finally(() => {
+  process.exit();
+})
