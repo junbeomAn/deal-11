@@ -7,7 +7,10 @@ const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
+const { sequelize } = require('./models/index');
+
 const app = express();
+sequelize.sync();
 
 const PORT = process.env.PORT || 3000;
 
