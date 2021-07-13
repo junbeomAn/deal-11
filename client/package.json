@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "build:dev": "NODE_ENV=development webpack"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.14.7",
