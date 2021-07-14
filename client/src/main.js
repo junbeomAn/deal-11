@@ -29,7 +29,6 @@ let scrollRange = 0;
 let scrollTimeOut = null;
 
 function setScrollBar() {
-  $app.scrollTo(0, 0);
   const pageRootElem = document.querySelector('#app > *');
   const { height } = pageRootElem.getBoundingClientRect();
   if (height) scrollHeight = window.innerHeight * (window.innerHeight / height);
@@ -51,8 +50,12 @@ function scrollHandler() {
     scrollTimeOut = null;
   }, 1000);
 }
-
+window.addEventListener('resize', () => {
+  setScrollBar();
+  scrollHandler();
+});
 $app.addEventListener('route', () => {
+  $app.scrollTo(0, 0);
   setScrollBar();
 });
 $app.addEventListener('scroll', () => {
