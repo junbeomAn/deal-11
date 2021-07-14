@@ -53,8 +53,8 @@ class Router {
       return;
     }
     if (route.middleware) {
-      if (route.asyncMiddleware) {
-        route.middleware.then((res) => {
+      if (route.async) {
+        new Promise(route.middleware).then((res) => {
           if (res) this.render(route);
         });
       } else {
