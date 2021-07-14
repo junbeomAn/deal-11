@@ -6,7 +6,7 @@ const { injectAuthStateToSession } = require('./utils');
 // /auth
 router.post('/signin', function (req, res, next) {
   const { username } = req.body;
-  const query = `SELECT * FROM USERS WHERE USERNAME = ?`;
+  const query = `SELECT * FROM users WHERE username = ?`;
   const arguments = [username];
   pool
     .execute(query, arguments)
@@ -25,13 +25,13 @@ router.post('/signin', function (req, res, next) {
 
 router.post('/signup', function (req, res, next) {
   const { username, location_one, location_two } = req.body;
-  const query = `SELECT * FROM USERS WHERE USERNAME = ?`;
+  const query = `SELECT * FROM users WHERE username = ?`;
 
   pool
     .execute(query, [username])
     .then(([results, fields]) => {
       if (!results.length) {
-        const query = `INSERT INTO USERS(USERNAME, LOCATION_ONE, LOCATION_TWO) VALUES(?, ?, ?)`;
+        const query = `INSERT INTO USERS(username, location_one, location_two) VALUES(?, ?, ?)`;
         const arguments = [username, location_one, location_two || null]
         pool
           .execute(query, arguments)

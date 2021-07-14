@@ -21,6 +21,8 @@ const makeImageUrlString = (files = []) => {
 };
 
 const parseImageUrlStringToArray = (str) => {
+  if (!str) return [];
+
   const imageUrls = str.split(';');
   imageUrls.pop();
   return imageUrls;
