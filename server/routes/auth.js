@@ -12,7 +12,7 @@ router.post('/signin', function (req, res, next) {
     .execute(query, arguments)
     .then(([results, fields]) => {
       if (results.length > 0) {
-        injectAuthStateToSession(req);
+        injectAuthStateToSession(req, results[0].id);
         res.json({ message: '로그인이 완료되었습니다.', ok: true });
       } else {
         res.status(401).json({ message: '로그인 실패', ok: false });

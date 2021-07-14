@@ -1,6 +1,6 @@
-const injectAuthStateToSession = (req) => {
+const injectAuthStateToSession = (req, id) => {
   req.session.isLogin = true;
-  req.session.userId = results[0].id;
+  req.session.userId = id;
 };
 
 module.exports = {

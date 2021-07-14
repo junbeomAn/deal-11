@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-const makeImageUrlString = (files) => {
+const makeImageUrlString = (files = []) => {
   let image_url = '';
 
   files.forEach((file) => {
