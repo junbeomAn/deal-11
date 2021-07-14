@@ -23,7 +23,7 @@ module.exports = {
       "NOT NULL"
     ],
     image_url: [
-      "VARCHAR(200)",
+      "TEXT",
     ]
   },
   associate: {
