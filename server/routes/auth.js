@@ -55,4 +55,14 @@ router.post('/signup', function (req, res, next) {
     });
 });
 
+router.get('/signout', function(req, res, next) {
+  req.session.destroy(function(err) {
+    if (err) { 
+      console.error(err);
+      next(err);
+    }
+    res.status(200).send({ message: '로그아웃 되었습니다', ok: true });
+  });
+})
+
 module.exports = router;
