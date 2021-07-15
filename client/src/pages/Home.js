@@ -1,5 +1,8 @@
 import Component from '../core/Component';
 import categoryI from '../assets/category.svg';
+import accountI from '../assets/account.svg';
+import menuI from '../assets/menu.svg';
+import locationI from '../assets/location.svg';
 import '../scss/home.scss';
 
 export default class Home extends Component {
@@ -7,49 +10,71 @@ export default class Home extends Component {
     return `
       <div class="home-wrapper">
         <nav class="home-nav">
-          <div class="left">
+          <div class="left nav-btn-container">
             <button class="category-btn"><img src=${categoryI}></button>
-            <h1></h1>
-            <h2>${this.$state.name}</h2>
+          </div>
+          <div class="center">
+            <button class="location-btn">
+            </button>
+          </div>
+          <div class="right nav-btn-container">
+            <button class="my-info-btn"><img src=${accountI}></button>
+            <button class="menu-btn"><img src=${menuI}></button>
           </div>
         </nav>
       </div>
     `;
   }
   mounted() {
-    this.childReRender();
+    const text = this.$state.login ? '동네' : '로그인 해주세요';
+    this.childReRender([
+      {
+        childClass: Location,
+        selector: '.location-btn',
+        props: {
+          login: this.$state.login,
+          text,
+        },
+      },
+    ]);
   }
   setup() {
     this.$state = {
-      login: this.store.states.isLogin,
-      name: 'woowa',
+      login: this.store.getState('isLogin'),
     };
   }
-  shouldComponentUpdate(prevState, nextState) {
-    if (prevState.name === nextState.name) return false;
-  }
   setEvent() {
-    this.addEvent('click', '.category-btn', () => {
-      this.store.dispatch('loginTrue');
-      this.setState({
-        login: this.store.getState('isLogin'),
+    this.addEvent('click', '.my-info-btn', () => {
+      this.store.dispatch('loginReverse').then(() => {
+        this.setState({
+          login: this.store.getState('isLogin'),
+        });
       });
-      this.childReRender();
     });
   }
-  childReRender() {
-    new Head(
-      document.querySelector('.left > h1'),
-      {
-        login: this.$state.login,
-      },
-      this.store
-    );
+  shouldComponentUpdate(prevState, nextState) {
+    if (prevState.login !== nextState.login) {
+      const text = nextState.login ? '동네' : '로그인 해주세요';
+      this.childReRender([
+        {
+          childClass: Location,
+          selector: '.location-btn',
+          props: {
+            login: nextState.login,
+            text,
+          },
+        },
+      ]);
+    }
+    return false;
   }
 }
 
-class Head extends Component {
+class Location extends Component {
   template() {
-    return `${this.$props.login ? 'hi user' : 'please login'}`;
+    return `
+      ${this.$props.login ? `<img src=${locationI}>` : ''}
+      <h2>${this.$props.text}</h2>
+    `;
   }
 }

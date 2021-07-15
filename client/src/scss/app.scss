@@ -7,6 +7,7 @@
 body {
   background-color: #aaa;
   overflow: hidden;
+  font-family: 'Noto Sans KR', sans-serif;
 }
 #wrapper {
   position: fixed;
@@ -25,7 +26,7 @@ body {
     background-color: $baemin_dark;
     width: 8px;
     border-radius: 3px;
-    z-index: 2;
+    z-index: 5;
     opacity: 0;
 
     &.fade-in {

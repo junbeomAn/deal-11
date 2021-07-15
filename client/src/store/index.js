@@ -6,9 +6,17 @@ class Store {
     loginTrue: () => {
       this.setState('isLogin', true);
     },
+    loginReverse: () => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          this.setState('isLogin', !this.getState('isLogin'));
+          resolve(true);
+        }, 1000);
+      });
+    },
   };
   dispatch(funcName) {
-    this.actions[funcName]();
+    return this.actions[funcName]();
   }
   setState(stateName, value) {
     this.states[stateName] = value;
