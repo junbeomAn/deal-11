@@ -5,31 +5,46 @@ import menuI from '../assets/menu.svg';
 import locationI from '../assets/location.svg';
 import '../scss/home.scss';
 
-export default class Home extends Component {
+export default class HomeWrapper extends Component {
   template() {
     return `
-      <div class="home-wrapper">
-        <nav class="home-nav">
-          <div class="left nav-btn-container">
-            <button class="category-btn"><img src=${categoryI}></button>
-          </div>
-          <div class="center">
-            <button class="location-btn">
-            </button>
-          </div>
-          <div class="right nav-btn-container">
-            <button class="my-info-btn"><img src=${accountI}></button>
-            <button class="menu-btn"><img src=${menuI}></button>
-          </div>
-        </nav>
-        <button class="plus-btn">
-          <svg viewBox="0 0 100 100">
-            <line x1="50" y1="30" x2="50" y2="70"/>
-            <line x1="30" y1="50" x2="70" y2="50"/>
-          </svg>
-        </button>
-        <div class="modal-wrapper"></div>
-      </div>
+    <div class="home-wrapper"></div>
+    `;
+  }
+  mounted() {
+    new Home(
+      this.$target.querySelector('.home-wrapper'),
+      this.$props,
+      this.store
+    );
+  }
+}
+
+class Home extends Component {
+  template() {
+    return `
+      
+      <nav class="home-nav">
+        <div class="left nav-btn-container">
+          <button class="category-btn"><img src=${categoryI}></button>
+        </div>
+        <div class="center">
+          <button class="location-btn">
+          </button>
+        </div>
+        <div class="right nav-btn-container">
+          <button class="my-info-btn"><img src=${accountI}></button>
+          <button class="menu-btn"><img src=${menuI}></button>
+        </div>
+      </nav>
+      <button class="plus-btn">
+        <svg viewBox="0 0 100 100">
+          <line x1="50" y1="30" x2="50" y2="70"/>
+          <line x1="30" y1="50" x2="70" y2="50"/>
+        </svg>
+      </button>
+      <div class="modal-wrapper"></div>
+      
     `;
   }
   mounted() {
@@ -61,10 +76,13 @@ export default class Home extends Component {
     });
     this.addEvent('click', '.plus-btn', () => {
       const modal = this.$target.querySelector('.modal-wrapper');
-      const prevModalOn = this.store.getState('homeModal');
+      let prevModalOn = this.store.getState('homeModal');
       this.store.dispatch('modalChange', !prevModalOn);
       this.$target.querySelector('.plus-btn').classList.toggle('exit-btn');
-
+      if (prevModalOn && !modal.classList.contains('on')) {
+        this.store.dispatch('modalChange', true);
+        prevModalOn = false;
+      }
       if (prevModalOn) {
         this.$target.querySelector('.modal > div').classList.add('down');
         setTimeout(() => {
