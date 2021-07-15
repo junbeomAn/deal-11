@@ -23,7 +23,8 @@ router.get('/', function (req, res) {
 
   const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
   const locationSubQuery = `SELECT id FROM USERS WHERE location LIKE '%${currentLocation}%'`;
-  let selectProductQuery = `SELECT B.id, title, created_at, (${userIdSubQuery}) AS 'username', image_url FROM PRODUCTS B RIGHT JOIN (${locationSubQuery}) AS C ON B.user_id = C.id`;
+  let selectProductQuery = `SELECT B.id, title, created_at, (${userIdSubQuery}) AS 'username', image_url FROM PRODUCTS B`;
+  selectProductQuery += ` RIGHT JOIN (${locationSubQuery}) AS C ON B.user_id = C.id`;
   selectProductQuery += ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
 
   arguments.push(String(page));
@@ -42,25 +43,35 @@ router.get('/', function (req, res) {
     });
 });
 
-router.get('/category/:category_name', (req, res) => {
-  const { page = 0 } = req.query;
+router.get('/category/:category_name', (req, res) => { // query: page, selected / params: category_name
+  const { page = 0, selected } = req.query;
   const { category_name } = req.params;
   const FETCH_COUNT = 10;
-  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
-  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
   const arguments = [];
+  const { user } = req.session;
+  const currentLocation = user.location[selected];
   
-  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
-
-  if (category) {
-    selectProductQuery += ` HAVING category = ?`;
-    arguments.push(category)
-  }
-
-  selectProductQuery += ` LIMIT ${FETCH_COUNT} OFFSET ?`
+  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
+  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
+  const locationSubQuery = `SELECT id FROM USERS WHERE location LIKE '%${currentLocation}%'`;
+  let selectProductQuery = `SELECT B.id, title, created_at, (${userIdSubQuery}) AS 'username',(${categoryIdSubQuery}) AS 'category', image_url FROM PRODUCTS B`;
+  selectProductQuery += ` RIGHT JOIN (${locationSubQuery}) AS C ON B.user_id = C.id`;
+  selectProductQuery += ` HAVING category = ? ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
+  arguments.push(category_name);
   arguments.push(String(page))
 
-
+  pool
+    .execute(selectProductQuery, arguments)
+    .then(([products, fields]) => {
+      const result = getProductsWithImageUrlArray(products);
+      
+      res.status(200).send(result);
+    })
+    .catch((err) => {
+      res
+        .status(500)
+        .json({ message: 'Product Fetch Server Error', err, ok: false });
+    });
 })
 
 router.get('/:productId', (req, res) => {
