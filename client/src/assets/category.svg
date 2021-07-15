@@ -2,8 +2,9 @@
   xmlns="http://www.w3.org/2000/svg"
   width="36"
   height="36"
-  fill="#000000"
+  fill="#fff"
   viewBox="0 0 27.9 27.91"
+  stroke-width="5"
 >
   <g>
     <path

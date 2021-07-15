@@ -1,6 +1,7 @@
 import { initRouter, $router } from './lib/router.js';
 import Home from './pages/Home.js';
 import MyInfo from './pages/MyInfo.js';
+import store from './store';
 import './scss/app.scss';
 
 /**
@@ -62,6 +63,6 @@ $app.addEventListener('scroll', () => {
   scrollHandler();
 });
 async function init() {
-  initRouter({ $app, routes, routeEvent });
+  initRouter({ $app, routes, routeEvent, store });
 }
 init();
