@@ -1,8 +1,10 @@
 const injectAuthStateToSession = (req, { id, location, username }) => {
-  req.session.isLogin = true;
-  req.session.userId = id;
-  req.session.location = location;
-  req.session.username = username;
+  req.session.user = {
+    isLogin: true,
+    userId: id,
+    location,
+    username,
+  };
 };
 
 const getNewUserInfo = (userInfo) => {

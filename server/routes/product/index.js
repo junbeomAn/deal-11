@@ -4,24 +4,30 @@ const router = express.Router();
 const pool = require('../../db/index.js');
 const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./utils.js');
 
+router.use(function (req, res, next) { // 이 이후 라우터는 로그인 안되어 있으면 접근불가.
+  const { user } = req.session;
+  if (!user) {
+    res.status(401).json({ message: 'No authorized', ok: false });
+  } else {
+    next();
+  }
+});
+
 // /product
 router.get('/', function (req, res) {
-  const { offset = 0, category } = req.query;
-  // user의 로그인 여부에 따른 conditional data가 필요.
-  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
-  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
+  const { page = 0, selected } = req.query;
+  const FETCH_COUNT = 10;
   const arguments = [];
-  
-  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
+  const { user } = req.session;
+  const currentLocation = user.location[selected];
 
-  if (category) {
-    selectProductQuery += ` HAVING category = ?`;
-    arguments.push(category)
-  }
-  
-  selectProductQuery += ` LIMIT 15 OFFSET ?`
-  arguments.push(String(offset))
-  
+  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
+  const locationSubQuery = `SELECT id FROM USERS WHERE location LIKE '%${currentLocation}%'`;
+  let selectProductQuery = `SELECT B.id, title, created_at, (${userIdSubQuery}) AS 'username', image_url FROM PRODUCTS B RIGHT JOIN (${locationSubQuery}) AS C ON B.user_id = C.id`;
+  selectProductQuery += ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
+
+  arguments.push(String(page));
+
   pool
     .execute(selectProductQuery, arguments)
     .then(([products, fields]) => {
@@ -35,6 +41,27 @@ router.get('/', function (req, res) {
         .json({ message: 'Product Fetch Server Error', err, ok: false });
     });
 });
+
+router.get('/category/:category_name', (req, res) => {
+  const { page = 0 } = req.query;
+  const { category_name } = req.params;
+  const FETCH_COUNT = 10;
+  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
+  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
+  const arguments = [];
+  
+  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
+
+  if (category) {
+    selectProductQuery += ` HAVING category = ?`;
+    arguments.push(category)
+  }
+
+  selectProductQuery += ` LIMIT ${FETCH_COUNT} OFFSET ?`
+  arguments.push(String(page))
+
+
+})
 
 router.get('/:productId', (req, res) => {
   const { productId } = req.params;
@@ -56,22 +83,16 @@ router.get('/:productId', (req, res) => {
     })
 })
 
-router.use(function (req, res, next) { // 이 이후 라우터는 로그인 안되어 있으면 접근불가.
-  if (!req.session.isLogin) {
-    res.status(401).json({ message: 'No authorized', ok: false });
-  } else {
-    next();
-  }
-});
+
 
 router.post('/', upload.array('product-images'), (req, res) => {
   // front html form 에서 input field name => product-images
-  const { userId } = req.session;
-  const { title, content, category, locationOne } = req.body;// location 따로 쿼리
+  const { userId } = req.session.user;
+  const { title, content, category, price } = req.body;
   const categoryIdSubQuery = `SELECT id FROM CATEGORIES WHERE NAME = '${category}' LIMIT 1`;
-  const query = `INSERT INTO PRODUCTS(title, content, user_id, category_id, image_url, location_one) VALUES(?, ?, ?, (${categoryIdSubQuery}), ?, ?)`;
+  const query = `INSERT INTO PRODUCTS(title, content, user_id, category_id, image_url, price) VALUES(?, ?, ?, (${categoryIdSubQuery}), ?, ?)`;
   const image_url = makeImageUrlString(req.files);
-  const arguments = [title, content, userId, image_url, locationOne];
+  const arguments = [title, content, userId, image_url, price];
 
   pool
     .execute(query, arguments)
