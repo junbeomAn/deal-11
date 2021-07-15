@@ -1,6 +1,7 @@
 class Store {
   states = {
     isLogin: false,
+    homeModal: false,
   };
   actions = {
     loginTrue: () => {
@@ -14,9 +15,12 @@ class Store {
         }, 1000);
       });
     },
+    modalChange: (bool) => {
+      this.setState('homeModal', bool);
+    },
   };
-  dispatch(funcName) {
-    return this.actions[funcName]();
+  dispatch(funcName, args = {}) {
+    return this.actions[funcName](args);
   }
   setState(stateName, value) {
     this.states[stateName] = value;
