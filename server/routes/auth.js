@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/index.js');
-const { injectAuthStateToSession } = require('./utils');
+const { injectAuthStateToSession, getNewUserInfo } = require('./utils');
 
 // /auth
 router.post('/signin', function (req, res, next) {
@@ -12,8 +12,10 @@ router.post('/signin', function (req, res, next) {
     .execute(query, arguments)
     .then(([results, fields]) => {
       if (results.length > 0) {
-        injectAuthStateToSession(req, results[0].id);
-        res.json({ message: '로그인이 완료되었습니다.', ok: true });
+        const userInfo = getNewUserInfo(results[0]);
+
+        injectAuthStateToSession(req, userInfo);
+        res.json({ message: '로그인이 완료되었습니다.', ...userInfo, ok: true });
       } else {
         res.status(401).json({ message: '로그인 실패', ok: false });
       }
@@ -24,15 +26,17 @@ router.post('/signin', function (req, res, next) {
 });
 
 router.post('/signup', function (req, res, next) {
-  const { username, location_one, location_two } = req.body;
+  const { username, location } = req.body;
   const query = `SELECT * FROM users WHERE username = ?`;
+  const locationString = location.join(';') + ';';
+  console.log(locationString)
 
   pool
     .execute(query, [username])
     .then(([results, fields]) => {
       if (!results.length) {
-        const query = `INSERT INTO USERS(username, location_one, location_two) VALUES(?, ?, ?)`;
-        const arguments = [username, location_one, location_two || null]
+        const query = `INSERT INTO USERS(username, location) VALUES(?, ?)`;
+        const arguments = [username, locationString]
         pool
           .execute(query, arguments)
           .then(() => {

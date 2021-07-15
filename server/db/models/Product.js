@@ -7,7 +7,6 @@ module.exports = {
     user_id: ['INTEGER', 'NOT NULL'],
     category_id: ['INTEGER', 'NOT NULL'],
     image_url: ['TEXT'],
-    location_one: ['VARCHAR(100)'],
   },
   associate: {
     user_id: {

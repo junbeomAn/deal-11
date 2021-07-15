@@ -67,7 +67,7 @@ router.use(function (req, res, next) { // 이 이후 라우터는 로그인 안�
 router.post('/', upload.array('product-images'), (req, res) => {
   // front html form 에서 input field name => product-images
   const { userId } = req.session;
-  const { title, content, category, locationOne } = req.body;
+  const { title, content, category, locationOne } = req.body;// location 따로 쿼리
   const categoryIdSubQuery = `SELECT id FROM CATEGORIES WHERE NAME = '${category}' LIMIT 1`;
   const query = `INSERT INTO PRODUCTS(title, content, user_id, category_id, image_url, location_one) VALUES(?, ?, ?, (${categoryIdSubQuery}), ?, ?)`;
   const image_url = makeImageUrlString(req.files);
