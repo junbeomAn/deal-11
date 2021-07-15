@@ -1,7 +1,7 @@
 module.exports = {
   tableName: "Products",
   attributes: {
-    titie: [
+    title: [
       "VARCHAR(200)",
       "NOT NULL",
     ],
@@ -21,6 +21,9 @@ module.exports = {
     category_id: [
       "INTEGER",
       "NOT NULL"
+    ],
+    image_url: [
+      "TEXT",
     ]
   },
   associate: {
