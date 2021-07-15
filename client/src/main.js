@@ -15,24 +15,53 @@ import './scss/app.scss';
  *   - redirect로 바로 이동합니다.
  * - $router 객체를 이용해서 push 할 수 있습니다.
  */
-const testPromise = (resolve, reject) => {
-  setTimeout(() => {
-    $router.push('/myinfo');
-    resolve(false);
-  }, 1000);
-};
 const routes = [
   { path: '/', redirect: '/home' },
-  {
-    path: '/home',
-    component: Home,
-    middleware: testPromise,
-    async: true,
-  },
+  { path: '/home', component: Home },
   { path: '/myinfo', component: MyInfo },
 ];
+const routeEvent = new CustomEvent('route');
 const $app = document.querySelector('#app');
+const scrollBar = document.querySelector('#custom-scroll-bar');
+let scrollHeight = 0;
+let remainScroll = 0;
+let scrollRange = 0;
+let scrollTimeOut = null;
+
+function setScrollBar() {
+  const pageRootElem = document.querySelector('#app > *');
+  const { height } = pageRootElem.getBoundingClientRect();
+  if (height) scrollHeight = window.innerHeight * (window.innerHeight / height);
+  remainScroll = window.innerHeight - scrollHeight;
+  scrollRange = height - window.innerHeight;
+  scrollBar.style.height = `${scrollHeight}px`;
+}
+function scrollHandler() {
+  scrollBar.style.transform = `translateY(${
+    remainScroll * ($app.scrollTop / scrollRange)
+  }px)`;
+  if (scrollTimeOut) {
+    clearTimeout(scrollTimeOut);
+  } else {
+    scrollBar.setAttribute('class', 'fade-in');
+  }
+  scrollTimeOut = setTimeout(() => {
+    scrollBar.setAttribute('class', 'fade-out');
+    scrollTimeOut = null;
+  }, 1000);
+}
+window.addEventListener('resize', () => {
+  setScrollBar();
+  scrollHandler();
+});
+$app.addEventListener('route', () => {
+  $app.scrollTo(0, 0);
+  setScrollBar();
+});
+$app.addEventListener('scroll', () => {
+  scrollHandler();
+});
 async function init() {
-  initRouter({ $app, routes });
+  initRouter({ $app, routes, routeEvent });
 }
 init();

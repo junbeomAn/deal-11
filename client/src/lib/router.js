@@ -5,9 +5,11 @@ import { isClass } from '../utils.js';
 class Router {
   $app = null;
   routes = null;
-  constructor({ $app, routes, fallback }) {
+  routeEvent = null;
+  constructor({ $app, routes, routeEvent }) {
     this.$app = $app;
-    this.fallback = fallback ?? '/';
+    this.fallback = '/';
+    this.routeEvent = routeEvent;
     this.generateRoutes(routes);
     this.initEvent();
   }
@@ -36,6 +38,7 @@ class Router {
     const component = this.getComponent(route);
     if (isClass(component)) {
       new component(this.$app);
+      this.$app.dispatchEvent(this.routeEvent);
     } else {
       throw new Error(`Invalid component`);
     }
