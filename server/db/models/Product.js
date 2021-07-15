@@ -8,6 +8,7 @@ module.exports = {
     category_id: ['INTEGER', 'NOT NULL'],
     price: ['INTEGER', 'NOT NULL'],
     image_url: ['TEXT'],
+    price: ['INTEGER', 'NOT NULL'],
   },
   associate: {
     user_id: {
