@@ -6,21 +6,16 @@ const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./
 
 // /product
 router.get('/', function (req, res) {
-  const { offset = 0, category } = req.query;
+  const { page = 0 } = req.query;
   // user의 로그인 여부에 따른 conditional data가 필요.
+  const FETCH_COUNT = 10;
   const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
-  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
   const arguments = [];
   
-  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
-
-  if (category) {
-    selectProductQuery += ` HAVING category = ?`;
-    arguments.push(category)
-  }
+  let selectProductQuery = `SELECT id, title, created_at, (${userIdSubQuery}) AS 'username', image_url FROM PRODUCTS B`;
   
-  selectProductQuery += ` LIMIT 15 OFFSET ?`
-  arguments.push(String(offset))
+  selectProductQuery += ` ORDERBY created_at LIMIT ${FETCH_COUNT} OFFSET ?`
+  arguments.push(String(page))
   
   pool
     .execute(selectProductQuery, arguments)
@@ -35,6 +30,27 @@ router.get('/', function (req, res) {
         .json({ message: 'Product Fetch Server Error', err, ok: false });
     });
 });
+
+router.get('/category/:category_name', (req, res) => {
+  const { page = 0 } = req.query;
+  const { category_name } = req.params;
+  const FETCH_COUNT = 10;
+  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
+  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
+  const arguments = [];
+  
+  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
+
+  if (category) {
+    selectProductQuery += ` HAVING category = ?`;
+    arguments.push(category)
+  }
+
+  selectProductQuery += ` LIMIT ${FETCH_COUNT} OFFSET ?`
+  arguments.push(String(page))
+
+
+})
 
 router.get('/:productId', (req, res) => {
   const { productId } = req.params;
