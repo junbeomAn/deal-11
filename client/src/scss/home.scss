@@ -1,0 +1,18 @@
+@import 'theme';
+
+.home-wrapper {
+  height: 1490px;
+}
+.home-nav {
+  background-color: $baemin;
+  padding: 1rem;
+  color: white;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+
+  button {
+    background-color: inherit;
+    border: none;
+  }
+}
