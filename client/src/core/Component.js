@@ -52,5 +52,26 @@ export default class Componet {
       callback(e);
     });
   }
-  childReRender() {}
+  /**
+   * options: array
+   * option(options의 value들): object
+   *  - option.childClass: class
+   *  - option.selector: parent selector
+   *  - option.props: props object
+   *  - option.repeat : array (optional) 선택 반복이 필요할 때
+   *  - option.repeat의 자식은 props object
+   *    - !! 주의 !! repeat 속성이 존재하는 경우 repeat 배열 내에 props들을 넣어준다.
+   */
+  childReRender(options) {
+    options.forEach((option) => {
+      const parentNode = this.$target.querySelector(option.selector);
+      if (option.repeat) {
+        option.repeat.forEach((props) => {
+          new option.childClass(parentNode, props, this.store);
+        });
+      } else {
+        new option.childClass(parentNode, option.props, this.store);
+      }
+    });
+  }
 }
