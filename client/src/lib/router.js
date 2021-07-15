@@ -6,10 +6,12 @@ class Router {
   $app = null;
   routes = null;
   routeEvent = null;
-  constructor({ $app, routes, routeEvent }) {
+  store = null;
+  constructor({ $app, routes, routeEvent, store }) {
     this.$app = $app;
     this.fallback = '/';
     this.routeEvent = routeEvent;
+    this.store = store;
     this.generateRoutes(routes);
     this.initEvent();
   }
@@ -37,7 +39,7 @@ class Router {
   render(route) {
     const component = this.getComponent(route);
     if (isClass(component)) {
-      new component(this.$app);
+      new component(this.$app, {}, this.store);
       this.$app.dispatchEvent(this.routeEvent);
     } else {
       throw new Error(`Invalid component`);
