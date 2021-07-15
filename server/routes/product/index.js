@@ -7,6 +7,7 @@ const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./
 // /product
 router.get('/', function (req, res) {
   const { offset = 0, category } = req.query;
+  // user의 로그인 여부에 따른 conditional data가 필요.
   const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
   const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
   const arguments = [];
@@ -34,6 +35,26 @@ router.get('/', function (req, res) {
         .json({ message: 'Product Fetch Server Error', err, ok: false });
     });
 });
+
+router.get('/:productId', (req, res) => {
+  const { productId } = req.params;
+  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
+  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
+  const arguments = [productId];
+
+  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
+  selectProductQuery += ' HAVING id = ? LIMIT 1';
+  // console.log(selectProductQuery)
+  pool
+    .execute(selectProductQuery, arguments)
+    .then(([products, fields]) => {
+      const result = getProductsWithImageUrlArray(products)[0];
+      res.status(200).send(result);
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Product read error', ok: false, err });
+    })
+})
 
 router.use(function (req, res, next) { // 이 이후 라우터는 로그인 안되어 있으면 접근불가.
   if (!req.session.isLogin) {
@@ -64,9 +85,21 @@ router.post('/', upload.array('product-images'), (req, res) => {
     });
 });
 
+router.get('/user/:userId', (req, res) => {
+  const { userId } = req.params;
+  const { offset } = req.query;
+  const userIdSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
+  const categoryIdSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
+  const arguments = [userId, offset];
+
+  let selectProductQuery = `SELECT id, title, content, created_at, (${userIdSubQuery}) AS 'username', (${categoryIdSubQuery}) AS 'category', image_url, location_one FROM PRODUCTS B`;
+  selectProductQuery += ' WHERE user_id = ? LIMIT 15 OFFSET ?';
+
+
+})
+
 router
   .route('/:productId')
-  .get((req, res) => {})
   .put((req, res) => {})
   .delete((req, res) => {});
 
