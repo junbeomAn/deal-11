@@ -1,17 +1,7 @@
 module.exports = {
-  tableName: "Users",
+  tableName: 'Users',
   attributes: {
-    username: [
-      "VARCHAR(20)",
-      "NOT NULL",
-      "UNIQUE",
-    ],
-    location_one: [
-      "VARCHAR(100)",
-      "NOT NULL",
-    ],
-    location_two: [
-      "VARCHAR(100)",
-    ]
-  }
-}
+    username: ['VARCHAR(20)', 'NOT NULL', 'UNIQUE'],
+    location: ['TEXT', 'NOT NULL'],
+  },
+};
