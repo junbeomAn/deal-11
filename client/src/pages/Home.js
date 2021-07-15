@@ -38,9 +38,13 @@ export default class Home extends Component {
     });
   }
   childReRender() {
-    new Head(document.querySelector('.left > h1'), {
-      login: this.$state.login,
-    });
+    new Head(
+      document.querySelector('.left > h1'),
+      {
+        login: this.$state.login,
+      },
+      this.store
+    );
   }
 }
 

@@ -1,9 +1,9 @@
-import store from '../store';
 export default class Componet {
   $target;
   $props;
   $state;
-  constructor($target, $props) {
+  store;
+  constructor($target, $props, store) {
     this.$target = $target;
     this.$props = $props;
     this.store = store;
