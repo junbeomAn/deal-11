@@ -23,7 +23,6 @@ export default class HomeWrapper extends Component {
 class Home extends Component {
   template() {
     return `
-      
       <nav class="home-nav">
         <div class="left nav-btn-container">
           <button class="category-btn"><img src=${categoryI}></button>
@@ -31,6 +30,8 @@ class Home extends Component {
         <div class="center">
           <button class="location-btn">
           </button>
+          <div class="toggle-menu-wrapper">
+          </div>
         </div>
         <div class="right nav-btn-container">
           <button class="my-info-btn"><img src=${accountI}></button>
@@ -44,7 +45,6 @@ class Home extends Component {
         </svg>
       </button>
       <div class="modal-wrapper"></div>
-      
     `;
   }
   mounted() {
@@ -64,6 +64,7 @@ class Home extends Component {
     this.store.dispatch('modalChange', false);
     this.$state = {
       login: this.store.getState('isLogin'),
+      location: this.store.getState('location')[0],
     };
   }
   setEvent() {
@@ -99,10 +100,48 @@ class Home extends Component {
         ]);
       }
     });
+    this.addEvent('click', '.location-btn', () => {
+      const toggleMenuWrapper = this.$target.querySelector(
+        '.toggle-menu-wrapper'
+      );
+      const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
+      if (this.$state.login && !toggleMenu) {
+        this.childReRender([
+          {
+            childClass: ToggleMenu,
+            selector: '.toggle-menu-wrapper',
+            props: {
+              location: this.$state.location,
+            },
+          },
+        ]);
+      } else if (this.$state.login && toggleMenu) {
+        toggleMenu.classList.add('off');
+        setTimeout(() => {
+          while (toggleMenuWrapper.hasChildNodes()) {
+            toggleMenuWrapper.removeChild(toggleMenuWrapper.lastChild);
+          }
+        }, 300);
+      }
+    });
+    this.addEvent('click', '.home-wrapper', (e) => {
+      const toggleMenuWrapper = this.$target.querySelector(
+        '.toggle-menu-wrapper'
+      );
+      const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
+      if (!e.target.closest('.center') && toggleMenu) {
+        toggleMenu.classList.add('off');
+        setTimeout(() => {
+          while (toggleMenuWrapper.hasChildNodes()) {
+            toggleMenuWrapper.removeChild(toggleMenuWrapper.lastChild);
+          }
+        }, 300);
+      }
+    });
   }
   shouldComponentUpdate(prevState, nextState) {
     if (prevState.login !== nextState.login) {
-      const text = nextState.login ? '동네' : '로그인 해주세요';
+      const text = nextState.login ? nextState.location : '로그인 해주세요';
       this.childReRender([
         {
           childClass: Location,
@@ -123,6 +162,30 @@ class Location extends Component {
     return `
       ${this.$props.login ? `<img src=${locationI}>` : ''}
       <h2>${this.$props.text}</h2>
+    `;
+  }
+}
+
+class ToggleMenu extends Component {
+  template() {
+    return `
+      <div class="toggle-menu">
+      </div>
+    `;
+  }
+  mounted() {
+    new ToggleMenuButtons(
+      this.$target.querySelector('.toggle-menu'),
+      this.$props,
+      this.store
+    );
+  }
+}
+class ToggleMenuButtons extends Component {
+  template() {
+    return `
+      <button class="reload-btn">${this.$props.location}</button>
+      <button class="add-location-btn">내 동네 설정하기</button>
     `;
   }
 }

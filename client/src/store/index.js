@@ -2,6 +2,7 @@ class Store {
   states = {
     isLogin: false,
     homeModal: false,
+    location: ['동네', '옆 동네'],
   };
   actions = {
     loginTrue: () => {
