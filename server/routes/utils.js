@@ -7,7 +7,7 @@ const injectAuthStateToSession = (req, { id, location, username }) => {
   };
 };
 
-const getNewUserInfo = (userInfo) => {
+const convertLocationStrToArray = (userInfo) => {
   const locationArray = userInfo.location.split(';');
   locationArray.pop();
 
@@ -17,7 +17,14 @@ const getNewUserInfo = (userInfo) => {
   };
 };
 
+function runAsyncWrapper(callback) {
+  return function (req, res, next) {
+    callback(req, res, next).catch(next);
+  };
+}
+
 module.exports = {
   injectAuthStateToSession,
-  getNewUserInfo,
+  convertLocationStrToArray,
+  runAsyncWrapper,
 };
