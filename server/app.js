@@ -34,8 +34,17 @@ app.use(
   })
 );
 
-app.use('/api/v1', indexRouter);
 app.use('/auth', authRouter);
+app.use(function (req, res, next) {
+  // 이 이후 라우터는 로그인 안되어 있으면 접근불가.
+  const { user } = req.session;
+  if (!user) {
+    res.status(401).json({ message: 'No authorized', ok: false });
+  } else {
+    next();
+  }
+});
+app.use('/api/v1', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -47,9 +56,12 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-  // render the error page
   res.status(err.status || 500);
-  res.send(err);
+  res.json({
+    message: err.message || 'Server Error!',
+    status: err.status,
+    ok: err.ok || false,
+  });
 });
 
 app.listen(PORT, () => {
