@@ -9,6 +9,7 @@ module.exports = {
     price: ['INTEGER', 'NOT NULL'],
     image_url: ['TEXT'],
     price: ['INTEGER', 'NOT NULL'],
+    location_id: ['INTEGER', 'NOT NULL'],
   },
   associate: {
     user_id: {
@@ -17,6 +18,10 @@ module.exports = {
     },
     category_id: {
       ref: 'Categories',
+      target: 'id',
+    },
+    location_id: {
+      ref: 'Locations',
       target: 'id',
     },
   },
