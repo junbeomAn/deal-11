@@ -1,6 +1,6 @@
 import { initRouter, $router } from './lib/router.js';
-import Home from './pages/Home.js';
-import MyInfo from './pages/MyInfo.js';
+import Home from './component/home';
+import MyInfo from './component/auth';
 import store from './store';
 import './scss/app.scss';
 

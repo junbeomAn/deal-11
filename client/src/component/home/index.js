@@ -1,9 +1,9 @@
-import Component from '../core/Component';
-import categoryI from '../assets/category.svg';
-import accountI from '../assets/account.svg';
-import menuI from '../assets/menu.svg';
-import locationI from '../assets/location.svg';
-import '../scss/home.scss';
+import Component from '../../core/Component';
+import categoryI from '../../assets/category.svg';
+import accountI from '../../assets/account.svg';
+import menuI from '../../assets/menu.svg';
+import locationI from '../../assets/location.svg';
+import '../../scss/home.scss';
 
 export default class HomeWrapper extends Component {
   template() {

@@ -1,5 +1,5 @@
-import Component from '../core/Component';
-import '../scss/myinfo.scss';
+import Component from '../../core/Component';
+import '../../scss/myinfo.scss';
 
 export default class MyInfo extends Component {
   template() {
