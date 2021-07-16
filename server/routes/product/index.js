@@ -77,8 +77,10 @@ router.get('/:productId', runAsyncWrapper(async (req, res) => {
 }));
 
 
+
 // upload.array 로 여러개 받을수 있음. product-images는 client input 태그의 name 속성과 일치시킨다.
 // 업로드 된 파일은 req.files에 배열형태로 저장된다.
+
 router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res) => {
   // front html form 에서 input field name => product-images
   const { userId, location } = req.session.user;
@@ -95,6 +97,7 @@ router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res
   await pool.execute(insertQuery, arguments);
   res.send({ ok: true })
 }));
+
 
 router
   .route('/:productId')
