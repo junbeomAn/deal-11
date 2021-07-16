@@ -2,12 +2,20 @@ const express = require('express');
 
 const router = express.Router();
 const pool = require('../db/index.js');
+const { selectOrInsertLocation } = require('./location.js');
 const { injectAuthStateToSession, runAsyncWrapper, createError } = require('./utils');
+
+const { 
+  insertUserHasOneLocationQuery,
+  insertUserHasTwoLocationQuery,
+  existsUserQuery,
+  selectUserQuery,
+} = require('./query.js');
 
 // /auth
 router.post('/signin', runAsyncWrapper(async (req, res, next) => {
   const { username } = req.body;
-  const selectQuery = `SELECT * FROM users WHERE username = ?`;
+  const selectQuery = selectUserQuery;
   const arguments = [username];
   const [results] = await pool.execute(selectQuery, arguments);
   
@@ -35,23 +43,26 @@ router.post('/signin', runAsyncWrapper(async (req, res, next) => {
 
 router.post('/signup', runAsyncWrapper(async (req, res, next) => {
   const { username, location } = req.body;
-  const selectQuery = `SELECT * FROM users WHERE username = ?`;
   const arguments = [username];
 
-  const [results] = await pool.execute(selectQuery, arguments);
+  const [result, _] = await pool.execute(existsUserQuery, arguments);
+  const isExisted = result[0].result;
 
-  if (results.length > 0) {
+  if (isExisted) {
     next(createError(409, '이미 존재하는 사용자 이름입니다.', { ok: false }));
     return ;
   }
 
-  const firstLocationIdQuery = `SELECT id FROM LOCATIONS WHERE name = '${location[0]}'`;
-  let insertQuery = '';
+  const locationOneId = await selectOrInsertLocation(location[0]);
+  arguments.push(locationOneId);
+
+  let insertQuery;
   if (location[1]) {
-    const secondLocationIdQuery = `SELECT id FROM LOCATIONS WHERE name = '${location[1]}'`;
-    insertQuery = `INSERT INTO USERS(username, location_1_id, location_2_id) VALUES(?, (${firstLocationIdQuery}), (${secondLocationIdQuery}))`;
+    const locationTwoId = await selectOrInsertLocation(location[1]);
+    arguments.push(locationTwoId);
+    insertQuery = insertUserHasTwoLocationQuery
   } else {
-    insertQuery = `INSERT INTO USERS(username, location_1_id) VALUES(?, (${firstLocationIdQuery}))`;
+    insertQuery = insertUserHasOneLocationQuery
   }
 
   await pool.execute(insertQuery, arguments);
