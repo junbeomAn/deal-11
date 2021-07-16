@@ -1,3 +1,5 @@
+const createError = require('http-errors');
+
 const injectAuthStateToSession = (req, { id, location, username }) => {
   req.session.user = {
     isLogin: true,
@@ -7,13 +9,15 @@ const injectAuthStateToSession = (req, { id, location, username }) => {
   };
 };
 
-const convertLocationStrToArray = (userInfo) => {
-  const locationArray = userInfo.location.split(';');
-  locationArray.pop();
+const convertLocationToArray = (userInfo) => {
+  const { location_1_id, location_2_id, id, username } = userInfo;
+  const location = [location_1_id];
+  if (location_2_id) location.push(location_2_id);
 
   return {
-    ...userInfo,
-    location: locationArray,
+    id,
+    username,
+    location,
   };
 };
 
@@ -25,6 +29,7 @@ function runAsyncWrapper(callback) {
 
 module.exports = {
   injectAuthStateToSession,
-  convertLocationStrToArray,
+  convertLocationToArray,
   runAsyncWrapper,
+  createError,
 };
