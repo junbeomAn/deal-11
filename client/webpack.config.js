@@ -43,7 +43,7 @@ module.exports = {
       API_ENDPOINT: JSON.stringify('localhost:3000'),
     }),
     new HtmlWebpackPlugin({
-      template: './index.html',
+      template: './src/index.html',
       templateParameters: {
         env: process.env.NODE_ENV === 'development' ? '(개발용)' : '',
       },

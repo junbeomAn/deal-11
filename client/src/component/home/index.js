@@ -1,4 +1,8 @@
 import Component from '../../core/Component';
+
+import Modal from './Modal';
+import ToggleMenu from './ToggleMenu';
+
 import categoryI from '../../assets/category.svg';
 import accountI from '../../assets/account.svg';
 import menuI from '../../assets/menu.svg';
@@ -75,6 +79,7 @@ class Home extends Component {
         });
       });
     });
+
     this.addEvent('click', '.plus-btn', () => {
       const modal = this.$target.querySelector('.modal-wrapper');
       let prevModalOn = this.store.getState('homeModal');
@@ -100,6 +105,7 @@ class Home extends Component {
         ]);
       }
     });
+
     this.addEvent('click', '.location-btn', () => {
       const toggleMenuWrapper = this.$target.querySelector(
         '.toggle-menu-wrapper'
@@ -124,6 +130,7 @@ class Home extends Component {
         }, 300);
       }
     });
+
     this.addEvent('click', '.home-wrapper', (e) => {
       const toggleMenuWrapper = this.$target.querySelector(
         '.toggle-menu-wrapper'
@@ -163,75 +170,5 @@ class Location extends Component {
       ${this.$props.login ? `<img src=${locationI}>` : ''}
       <h2>${this.$props.text}</h2>
     `;
-  }
-}
-
-class ToggleMenu extends Component {
-  template() {
-    return `
-      <div class="toggle-menu">
-      </div>
-    `;
-  }
-  mounted() {
-    new ToggleMenuButtons(
-      this.$target.querySelector('.toggle-menu'),
-      this.$props,
-      this.store
-    );
-  }
-}
-class ToggleMenuButtons extends Component {
-  template() {
-    return `
-      <button class="reload-btn">${this.$props.location}</button>
-      <button class="add-location-btn">내 동네 설정하기</button>
-    `;
-  }
-}
-
-class Modal extends Component {
-  template() {
-    return `
-      <div class="modal">
-      </div>
-    `;
-  }
-  mounted() {
-    new ModalButtons(this.$target.querySelector('.modal'), {}, this.store);
-  }
-}
-
-class ModalButtons extends Component {
-  template() {
-    return `
-      <div>
-        <div class="modal-btn-container">
-          <p>게시하기</p>
-          <div><i class="fas fa-pencil-alt"></i></div>
-        </div>
-        <div class="modal-btn-container">
-          <p>내 동네 추가하기</p>
-          <div><i class="fas fa-building"></i></div>
-        </div>
-      </div>
-    `;
-  }
-  setEvent() {
-    this.addEvent('click', '.modal', (e) => {
-      if (!e.target.closest('.modal-btn-container')) {
-        this.store.dispatch('modalChange', false);
-        const modal = this.$target.parentNode;
-
-        document.querySelector('.plus-btn').classList.remove('exit-btn');
-        this.$target.querySelector('div').classList.add('down');
-        setTimeout(() => {
-          modal.classList.remove('on');
-          while (modal.hasChildNodes()) {
-            modal.removeChild(modal.lastChild);
-          }
-        }, 300);
-      }
-    });
   }
 }
