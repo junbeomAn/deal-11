@@ -10,21 +10,20 @@ const {
   insertUserHasTwoLocationQuery,
   existsUserQuery,
   selectUserQuery,
+  selectLocationNameQuery
 } = require('./query.js');
 
 // /auth
 router.post('/signin', runAsyncWrapper(async (req, res, next) => {
   const { username } = req.body;
-  const selectQuery = selectUserQuery;
   const arguments = [username];
-  const [results] = await pool.execute(selectQuery, arguments);
+  const [results] = await pool.execute(selectUserQuery, arguments);
   
   if (results.length === 0) {
     next(createError(401, '존재하지 않는 사용자', { ok: false }));
     return ;
   }
 
-  const selectLocationNameQuery = `SELECT name FROM LOCATIONS WHERE id = ?`;
   const { id, location_1_id, location_2_id } = results[0];
   const locationArray = [];
 
@@ -66,7 +65,7 @@ router.post('/signup', runAsyncWrapper(async (req, res, next) => {
   }
 
   await pool.execute(insertQuery, arguments);
-  res.send({ message: '회원가입이 완료되었습니다', ok: true });
+  res.status(201).send({ message: '회원가입이 완료되었습니다', ok: true });
   
 }));
 
