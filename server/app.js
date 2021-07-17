@@ -35,15 +35,6 @@ app.use(
 );
 
 app.use('/auth', authRouter);
-app.use(function (req, res, next) {
-  // 이 이후 라우터는 로그인 안되어 있으면 접근불가.
-  const { user } = req.session;
-  if (!user) {
-    res.status(401).json({ message: 'No authorized', ok: false });
-  } else {
-    next();
-  }
-});
 app.use('/api/v1', indexRouter);
 
 // catch 404 and forward to error handler

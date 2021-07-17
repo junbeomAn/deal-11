@@ -6,7 +6,7 @@ module.exports = {
     created_at: ['DATETIME', 'NOT NULL', 'DEFAULT CURRENT_TIMESTAMP'],
     user_id: ['INTEGER', 'NOT NULL'],
     category_id: ['INTEGER', 'NOT NULL'],
-    price: ['INTEGER', 'NOT NULL'],
+    price: ['INTEGER'],
     image_url: ['TEXT'],
     price: ['INTEGER', 'NOT NULL'],
     location_id: ['INTEGER', 'NOT NULL'],

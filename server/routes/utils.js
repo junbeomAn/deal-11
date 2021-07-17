@@ -1,4 +1,5 @@
 const createError = require('http-errors');
+const app = require('../app');
 
 const injectAuthStateToSession = (req, { id, location, username }) => {
   req.session.user = {
@@ -27,9 +28,21 @@ function runAsyncWrapper(callback) {
   };
 }
 
+function requiredLoginDecorator(router) {
+  return router.use((req, _, next) => {
+    const { user } = req.session;
+
+    if (user) {
+      next();
+    } else {
+      next(createError(401, 'please login', { ok: false }));
+    }
+  });
+}
+
 module.exports = {
   injectAuthStateToSession,
   convertLocationToArray,
   runAsyncWrapper,
-  createError,
+  requiredLoginDecorator,
 };

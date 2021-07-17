@@ -5,7 +5,8 @@
   "scripts": {
     "start": "nodemon app.js",
     "test": "mocha $(find ./test/ -name \"*.spec.js\")",
-    "dbcreate": "node db/create.js"
+    "dbcreate": "node db/create.js",
+    "insert:category": "node db/category.js"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -18,6 +19,7 @@
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
     "multer": "^1.4.2",
+    "multer-hash": "^1.0.0",
     "mysql2": "^2.2.5",
     "sequelize": "^6.6.5"
   },
