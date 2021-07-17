@@ -5,6 +5,7 @@ const insertUserHasTwoLocationQuery = `INSERT INTO USERS(username, location_1_id
 const existsUserQuery = `SELECT IF(EXISTS(SELECT * FROM users WHERE username = ?),1,0) AS result`;
 const selectUserQuery = `SELECT * FROM users WHERE username = ?`;
 const selectLocationNameQuery = `SELECT name FROM LOCATIONS WHERE id = ?`;
+const locationIdQuery = `SELECT id FROM LOCATIONS WHERE NAME = ?`;
 
 module.exports = {
   searchLocationQuery,
@@ -14,4 +15,5 @@ module.exports = {
   existsUserQuery,
   selectUserQuery,
   selectLocationNameQuery,
+  locationIdQuery,
 };
