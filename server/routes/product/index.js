@@ -6,26 +6,18 @@ const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./
 const { runAsyncWrapper, requiredLoginDecorator } = require('../utils');
 const { selectOrInsertLocation } = require('../location.js');
 const {
-  locationIdQuery
+  locationIdQuery,
+  selectProductListQuery,
 } = require('../query.js');
 
 const FETCH_COUNT = 10;
 
 // /product
 router.get('/', runAsyncWrapper(async (req, res) => {
-  const { page = 0, selected } = req.query;
-  const arguments = [String(page)];
-  const { user } = req.session;
-  const currentLocation = user.location[selected];
+  const { page = 1, location } = req.query;
+  const arguments = [String((page-1)*10)];
 
-  const userNameSubQuery = `SELECT username FROM USERS A WHERE A.id = B.user_id`;
-  const locationIdSubQuery = `SELECT id FROM LOCATIONS WHERE name = '${currentLocation}' LIMIT 1`;
-  const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE name = '${currentLocation}' LIMIT 1`;
-  let selectProductQuery = `SELECT B.id, title, created_at, (${userNameSubQuery}) AS 'username', (${locationNameSubQuery})AS 'location', image_url, price FROM PRODUCTS B`;
-  selectProductQuery += ` WHERE B.location_id = (${locationIdSubQuery})`;
-  selectProductQuery += ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
-
-  const [products] = await pool.execute(selectProductQuery, arguments);
+  const [products] = await pool.execute(selectProductListQuery(location), arguments);
   const result = getProductsWithImageUrlArray(products);
   res.send({ ok: true, result });
 }));
