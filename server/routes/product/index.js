@@ -7,6 +7,9 @@ const { runAsyncWrapper, requiredLoginDecorator } = require('../utils');
 const { selectOrInsertLocation } = require('../location.js');
 const {
   locationIdQuery,
+  insertProductQuery,
+  deleteLikeQuery,
+  insertLikeQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
 } = require('../query.js');
@@ -60,10 +63,23 @@ router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res
   const image_url = makeImageUrlString(req.files);
   const location_id = await selectOrInsertLocation(location);
   const arguments = [title, content, userId, category_id, image_url, price, location_id];
-  const insertQuery = `INSERT INTO PRODUCTS(title, content, user_id, category_id, image_url, price, location_id) VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
-  const [result] = await pool.execute(insertQuery, arguments);
+  const [result] = await pool.execute(insertProductQuery, arguments);
   res.send({ ok: true, detail_id: result.insertId });
+}));
+
+router.post('/like/:productId', runAsyncWrapper(async (req, res) => {
+  const { userId } = req.session.user;
+  const { productId } = req.params;
+  const arguments = [userId, productId];
+
+  const [result] = await pool.execute(deleteLikeQuery, arguments);
+  if (result.affectedRows) {
+    res.send({ like: false });
+  } else {
+    await pool.execute(insertLikeQuery, arguments);
+    res.status(201).json({ like: true });
+  }
 }));
 
 router.get('/mine', runAsyncWrapper(async (req, res) => {

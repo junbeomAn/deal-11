@@ -8,6 +8,9 @@ const existsUserQuery = `SELECT IF(EXISTS(SELECT * FROM users WHERE username = ?
 const selectUserQuery = `SELECT * FROM users WHERE username = ?`;
 const selectLocationNameQuery = `SELECT name FROM LOCATIONS WHERE id = ?`;
 const locationIdQuery = `SELECT id FROM LOCATIONS WHERE NAME = ?`;
+const insertProductQuery = `INSERT INTO PRODUCTS(title, content, user_id, category_id, image_url, price, location_id) VALUES(?, ?, ?, ?, ?, ?, ?)`;
+const deleteLikeQuery = `DELETE FROM USER_LIKE_PRODUCT WHERE user_id=? AND product_id=?`;
+const insertLikeQuery = `INSERT INTO USER_LIKE_PRODUCT(user_id, product_id) VALUES (?, ?)`;
 const whereLocation = (location) => {
   let returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location, COUNT(c.product_id) AS like_count FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id=b.id`;
   returnQuery += ` LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id=a.id`;
@@ -37,6 +40,9 @@ module.exports = {
   selectUserQuery,
   selectLocationNameQuery,
   locationIdQuery,
+  insertProductQuery,
+  deleteLikeQuery,
+  insertLikeQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
 };
