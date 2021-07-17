@@ -8,37 +8,32 @@ const { selectOrInsertLocation } = require('../location.js');
 const {
   locationIdQuery,
   selectProductListQuery,
+  selectCategoryItemsQuery,
 } = require('../query.js');
 
 const FETCH_COUNT = 10;
 
 // /product
+// '/' : 상품 전체 정보 가져오기
+// location, page 정보를 query로 받아와 상황에 맞게 응답한다.
+// location 없으면 그냥 전체 product 정보를 전달한다.
 router.get('/', runAsyncWrapper(async (req, res) => {
   const { page = 1, location } = req.query;
-  const arguments = [String((page-1)*10)];
+  const arguments = [String((page-1)*FETCH_COUNT)];
 
   const [products] = await pool.execute(selectProductListQuery(location), arguments);
   const result = getProductsWithImageUrlArray(products);
   res.send({ ok: true, result });
 }));
 
-router.get('/category/:category_name', runAsyncWrapper(async (req, res) => { // query: page, selected / params: category_name
-  const { page = 0, selected } = req.query;
-  const { category_name } = req.params;
-  const arguments = [category_name, String(page)];
-  const { user } = req.session;
-  const currentLocation = user.location[selected];
-  
-  const categoryNameSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
-  const userNameSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
-  const locationIdSubQuery = `SELECT id FROM LOCATIONS WHERE name = '${currentLocation}' LIMIT 1`;
-  const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE name = '${currentLocation}' LIMIT 1`;
-  let selectProductQuery = `SELECT B.id, title, created_at, (${userNameSubQuery}) AS 'username', (${categoryNameSubQuery}) AS 'category', (${locationNameSubQuery}) AS 'location', image_url, price FROM PRODUCTS B`;
-  selectProductQuery += ` WHERE B.location_id = (${locationIdSubQuery})`;
-  selectProductQuery += ` HAVING category = ? ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
+router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // query: page, selected / params: category_name
+  const { page = 1, location } = req.query;
+  const { category_id } = req.params;
+  const arguments = [category_id, String((page-1)*FETCH_COUNT)];
 
-  const [products] = await pool.execute(selectProductQuery, arguments);
+  const [products] = await pool.execute(selectCategoryItemsQuery(location, category_id), arguments);
   const result = getProductsWithImageUrlArray(products);
+
   res.send({ ok: true, result });
 }));
 

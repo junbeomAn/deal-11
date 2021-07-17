@@ -23,6 +23,22 @@ const selectProductListQuery = (location) => {
     returnQuery + ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
   );
 };
+const selectCategoryItemsQuery = (location, category_id) => {
+  let returnQuery;
+  if (location) {
+    const locationIdSubQuery = `SELECT id FROM LOCATIONS WHERE name = '${location}' LIMIT 1`;
+    const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE name = '${location}' LIMIT 1`;
+
+    returnQuery = `SELECT id, title, created_at, (${locationNameSubQuery}) AS 'location', image_url, price FROM PRODUCTS `;
+    returnQuery += ` WHERE location_id = (${locationIdSubQuery}) AND`;
+  } else {
+    returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON (a.location_id=b.id) WHERE`;
+  }
+  return (
+    returnQuery +
+    ` category_id = ${category_id} ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
+  );
+};
 
 module.exports = {
   searchLocationQuery,
@@ -34,4 +50,5 @@ module.exports = {
   selectLocationNameQuery,
   locationIdQuery,
   selectProductListQuery,
+  selectCategoryItemsQuery,
 };
