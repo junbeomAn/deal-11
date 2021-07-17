@@ -2,8 +2,9 @@ const express = require('express');
 
 const router = express.Router();
 const pool = require('../db/index.js');
+const createError = require('http-errors'); 
 const { selectOrInsertLocation } = require('./location.js');
-const { injectAuthStateToSession, runAsyncWrapper, createError } = require('./utils');
+const { injectAuthStateToSession, runAsyncWrapper, requiredLoginDecorator } = require('./utils');
 
 const { 
   insertUserHasOneLocationQuery,
@@ -69,6 +70,7 @@ router.post('/signup', runAsyncWrapper(async (req, res, next) => {
   
 }));
 
+requiredLoginDecorator(router);
 router.get('/signout', (req, res, next) => {
   req.session.destroy(function(err) {
     if (err) { 
