@@ -1,0 +1,47 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+.auth-wrapper {
+  height: 2102px;
+}
+
+.auth-wrapper {
+  .nav-bar-shared {
+    min-width: $min-width;
+    max-width: $max-width;
+    height: $nav-height;
+    border: 2px solid $line-grey;
+    position: relative;
+    display: flex;
+    align-items: center;
+    .nav-bar-btn {
+      justify-self: flex-start;
+      margin: 1.5rem;
+      img {
+        width: 30px;
+        height: 30px;
+      }
+      &:last-child {
+        justify-self: flex-end;
+      }
+    }
+    .title {
+      font: {
+        size: $text-medium;
+      }
+      position: absolute;
+      left: 50%;
+      // top: 5rem;
+      transform: translate(-50%, 20%);
+      top: 1.5rem;
+    }
+    &.grey {
+      background: {
+        color: $off-white;
+      }
+    }
+    &.transparent {
+      background-color: transparent;
+    }
+  }
+}
