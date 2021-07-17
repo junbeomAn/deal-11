@@ -1,3 +1,5 @@
+import Component from '../../core/Component';
+
 export default class ToggleMenuWrapper extends Component {
   template() {
     return `
