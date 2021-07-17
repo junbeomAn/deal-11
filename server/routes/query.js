@@ -8,36 +8,24 @@ const existsUserQuery = `SELECT IF(EXISTS(SELECT * FROM users WHERE username = ?
 const selectUserQuery = `SELECT * FROM users WHERE username = ?`;
 const selectLocationNameQuery = `SELECT name FROM LOCATIONS WHERE id = ?`;
 const locationIdQuery = `SELECT id FROM LOCATIONS WHERE NAME = ?`;
+const whereLocation = (location) => {
+  let returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location, COUNT(c.product_id) AS like_count FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id=b.id`;
+  returnQuery += ` LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id=a.id`;
+  if (location) returnQuery += ` WHERE b.name = '${location}'`;
+  return returnQuery;
+};
 const selectProductListQuery = (location) => {
-  let returnQuery;
-  if (location) {
-    const locationIdSubQuery = `SELECT id FROM LOCATIONS WHERE name = '${location}' LIMIT 1`;
-    const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE name = '${location}' LIMIT 1`;
-
-    returnQuery = `SELECT id, title, created_at, (${locationNameSubQuery})AS 'location', image_url, price FROM PRODUCTS`;
-    returnQuery += ` WHERE location_id = (${locationIdSubQuery})`;
-  } else {
-    returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON (a.location_id=b.id)`;
-  }
-  return (
-    returnQuery + ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
-  );
+  let returnQuery = whereLocation(location);
+  returnQuery += ` GROUP BY a.id ORDER BY a.created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
+  return returnQuery;
 };
 const selectCategoryItemsQuery = (location, category_id) => {
-  let returnQuery;
-  if (location) {
-    const locationIdSubQuery = `SELECT id FROM LOCATIONS WHERE name = '${location}' LIMIT 1`;
-    const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE name = '${location}' LIMIT 1`;
-
-    returnQuery = `SELECT id, title, created_at, (${locationNameSubQuery}) AS 'location', image_url, price FROM PRODUCTS `;
-    returnQuery += ` WHERE location_id = (${locationIdSubQuery}) AND`;
-  } else {
-    returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON (a.location_id=b.id) WHERE`;
-  }
-  return (
-    returnQuery +
-    ` category_id = ${category_id} ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`
-  );
+  let returnQuery = whereLocation(location);
+  if (location) returnQuery += ` AND`;
+  else returnQuery += ` WHERE`;
+  returnQuery += ` a.category_id = ${category_id}`;
+  returnQuery += ` GROUP BY a.id ORDER BY a.created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
+  return returnQuery;
 };
 
 module.exports = {

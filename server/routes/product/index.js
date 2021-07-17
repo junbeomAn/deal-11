@@ -29,7 +29,7 @@ router.get('/', runAsyncWrapper(async (req, res) => {
 router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // query: page, selected / params: category_name
   const { page = 1, location } = req.query;
   const { category_id } = req.params;
-  const arguments = [category_id, String((page-1)*FETCH_COUNT)];
+  const arguments = [String((page-1)*FETCH_COUNT)];
 
   const [products] = await pool.execute(selectCategoryItemsQuery(location, category_id), arguments);
   const result = getProductsWithImageUrlArray(products);
@@ -40,12 +40,6 @@ router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // qu
 router.get('/:productId', runAsyncWrapper(async (req, res) => {
   const { productId } = req.params;
   const arguments = [productId];
-
-  const userNameSubQuery = `SELECT username FROM users A WHERE A.id = B.user_id`;
-  const categoryNameSubQuery = `SELECT name FROM categories A WHERE A.id = B.category_id`;
-  const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE id = B.location_id`;
-  let selectProductQuery = `SELECT id, title, content, created_at, (${userNameSubQuery}) AS 'username', (${categoryNameSubQuery}) AS 'category', (${locationNameSubQuery}) AS 'location', image_url, price FROM PRODUCTS B`;
-  selectProductQuery += ' HAVING id = ? LIMIT 1';
   
   const [product] = await pool.execute(selectProductQuery, arguments);
   const result = getProductsWithImageUrlArray(product)[0];
