@@ -74,21 +74,16 @@ router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
 // upload.array 로 여러개 받을수 있음. product-images는 client input 태그의 name 속성과 일치시킨다.
 // 업로드 된 파일은 req.files에 배열형태로 저장된다.
 // 필요한 json 데이터는 String으로 전달하여 전달받아 server에서 parsing한다.
-router.post('/', runAsyncWrapper(async (req, res, next) => {
-  // front html form 에서 input field name => product-images
-  const isAuthorized = requiredLoginDecorator(req, next)();
-  
-  if (isAuthorized) {
-    upload.array('product-images');
-    const { userId } = req.session.user;
-    const { title, content, category_id, price, location } = JSON.parse(req.body.json);
-    const image_url = makeImageUrlString(req.files);
-    const location_id = await selectOrInsertLocation(location);
-    const arguments = [title, content, userId, category_id, image_url, price, location_id];
+router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
+  const { userId } = req.session.user;
+  const { title, content, category_id, price, location } = JSON.parse(req.body.data);
+  const image_url = makeImageUrlString(req.files);
+  const location_id = await selectOrInsertLocation(location);
+  const arguments = [title, content, userId, category_id, image_url, price, location_id];
 
-    const [result] = await pool.execute(insertProductQuery, arguments);
-    res.send({ ok: true, detail_id: result.insertId });
-  }
+  const [result] = await pool.execute(insertProductQuery, arguments);
+  res.send({ ok: true, detail_id: result.insertId });
+
 }));
 
 router.post('/like/:productId', runAsyncWrapper(async (req, res, next) => {
