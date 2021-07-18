@@ -70,4 +70,5 @@ module.exports = {
   upload,
   makeImageUrlString,
   getProductsWithImageUrlArray,
+  parseImageUrlStringToArray,
 };

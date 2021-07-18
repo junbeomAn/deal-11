@@ -1,8 +1,9 @@
 const express = require('express');
+const fs = require('fs');
 const createError = require('http-errors');
 const pool = require('../../db/index.js');
 const router = express.Router();
-const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./image.js');
+const { upload, makeImageUrlString, getProductsWithImageUrlArray, parseImageUrlStringToArray } = require('./image.js');
 const { runAsyncWrapper, requiredLoginDecorator } = require('../utils');
 const { selectOrInsertLocation } = require('../location.js');
 const {
@@ -10,6 +11,8 @@ const {
   insertProductQuery,
   deleteLikeQuery,
   insertLikeQuery,
+  selectIsAuthorized,
+  updateProductQuery,
   selectProductDetailQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
@@ -68,6 +71,35 @@ router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
     const result = getProductsWithImageUrlArray(product)[0];
     res.send({ ok: true, result });
   }
+}));
+
+router.put('/:productId', runAsyncWrapper(async (req, res, next) => {
+  const isLogin = requiredLoginDecorator(req, next)();
+  if (isLogin) {
+    const { productId } = req.params;
+    const { userId } = req.session.user;
+    const arguments = [userId, productId];
+    const [check] = await pool.execute(selectIsAuthorized, arguments);
+    if (check[0].authorized) {
+      const images = parseImageUrlStringToArray(check[0].image_url);
+      images.forEach(img => {
+        fs.unlinkSync(appPublic + img);
+      })
+      next();
+    } else {
+      next(createError(401, '수정 권한 없음'));
+    }
+  }
+}));
+router.put('/:productId', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
+  const { productId } = req.params;
+  const { title, content, price, location } = JSON.parse(req.body.data);
+  const image_url = makeImageUrlString(req.files);
+  const location_id = await selectOrInsertLocation(location);
+  const arguments = [title, content, image_url, price, location_id, productId];
+
+  const [result] = await pool.execute(updateProductQuery, arguments);
+  res.send({ ok: true });
 }));
 
 
