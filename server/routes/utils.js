@@ -28,16 +28,10 @@ function runAsyncWrapper(callback) {
   };
 }
 
-function requiredLoginDecorator(router) {
-  return router.use((req, _, next) => {
-    const { user } = req.session;
-
-    if (user) {
-      next();
-    } else {
-      next(createError(401, 'please login', { ok: false }));
-    }
-  });
+function requiredLoginDecorator(req, next) {
+  return function () {
+    if (!req.session.user) next(createError(404, '로그인을 해주세요.'));
+  };
 }
 
 module.exports = {

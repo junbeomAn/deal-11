@@ -13,6 +13,7 @@ const {
   selectProductDetailQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
+  selectMyProductQuery,
 } = require('../query.js');
 const { NotExtended } = require('http-errors');
 
@@ -41,8 +42,21 @@ router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // qu
   res.send({ ok: true, result });
 }));
 
+
+router.get('/mine', runAsyncWrapper(async (req, res, next) => {
+  requiredLoginDecorator(req, next)();
+  const { user } = req.session;
+  const { page = 1 } = req.query;
+  const arguments = [user.userId, String((page-1)*10)];
+  
+  const [products] = await pool.execute(selectMyProductQuery(), arguments);
+  const result = getProductsWithImageUrlArray(products);
+  res.json({ ok: true, result });
+}));
+
 router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
+  if (isNaN(parseInt(productId))) next();
   const { user } = req.session;
   const arguments = [productId];
   
@@ -56,14 +70,12 @@ router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
 }));
 
 
-// 여기서 부턴 로그인된 사용자만 사용 가능하다.
-requiredLoginDecorator(router);
-
 // upload.array 로 여러개 받을수 있음. product-images는 client input 태그의 name 속성과 일치시킨다.
 // 업로드 된 파일은 req.files에 배열형태로 저장된다.
 // 필요한 json 데이터는 String으로 전달하여 전달받아 server에서 parsing한다.
-router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res) => {
+router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
   // front html form 에서 input field name => product-images
+  requiredLoginDecorator(req, next)();
   const { userId } = req.session.user;
   const { title, content, category_id, price, location } = JSON.parse(req.body.json);
   const image_url = makeImageUrlString(req.files);
@@ -74,7 +86,8 @@ router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res
   res.send({ ok: true, detail_id: result.insertId });
 }));
 
-router.post('/like/:productId', runAsyncWrapper(async (req, res) => {
+router.post('/like/:productId', runAsyncWrapper(async (req, res, next) => {
+  requiredLoginDecorator(req, next)();
   const { userId } = req.session.user;
   const { productId } = req.params;
   const arguments = [userId, productId];
@@ -88,25 +101,12 @@ router.post('/like/:productId', runAsyncWrapper(async (req, res) => {
   }
 }));
 
-router.get('/mine', runAsyncWrapper(async (req, res) => {
-  const { user } = req.session;
-  const { page = 0 } = req.query;
-  const arguments = [user.userId, String(page)];
-  
-  const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE PRODUCTS.location_id = LOCATIONS.id`;
-  let selectProductQuery = `SELECT id, title, user_id, created_at, (${locationNameSubQuery}) AS location, image_url, price FROM PRODUCTS WHERE user_id = ?`;
-  selectProductQuery += ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
-
-  const [products] = await pool.execute(selectProductQuery, arguments);
-  const result = getProductsWithImageUrlArray(products);
-  res.send({ ok: true, result });
-}));
 
 
-router
-  .route('/:productId')
-  .put((req, res) => {})
-  .delete((req, res) => {});
+// router
+//   .route('/:productId')
+//   .put((req, res) => {})
+//   .delete((req, res) => {});
 
 
 module.exports = router;
