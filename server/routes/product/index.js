@@ -1,5 +1,5 @@
 const express = require('express');
-
+const createError = require('http-errors');
 const pool = require('../../db/index.js');
 const router = express.Router();
 const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./image.js');
@@ -10,9 +10,11 @@ const {
   insertProductQuery,
   deleteLikeQuery,
   insertLikeQuery,
+  selectProductDetailQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
 } = require('../query.js');
+const { NotExtended } = require('http-errors');
 
 const FETCH_COUNT = 10;
 
@@ -23,7 +25,6 @@ const FETCH_COUNT = 10;
 router.get('/', runAsyncWrapper(async (req, res) => {
   const { page = 1, location } = req.query;
   const arguments = [String((page-1)*FETCH_COUNT)];
-
   const [products] = await pool.execute(selectProductListQuery(location), arguments);
   const result = getProductsWithImageUrlArray(products);
   res.send({ ok: true, result });
@@ -40,13 +41,18 @@ router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // qu
   res.send({ ok: true, result });
 }));
 
-router.get('/:productId', runAsyncWrapper(async (req, res) => {
+router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
+  const { user } = req.session;
   const arguments = [productId];
   
-  const [product] = await pool.execute(selectProductQuery, arguments);
-  const result = getProductsWithImageUrlArray(product)[0];
-  res.send({ ok: true, result });
+  const [product] = await pool.execute(selectProductDetailQuery(user? user : {userId: 0}), arguments);
+  if (product.length === 0){
+    next(createError(404, "존재하지 않는 게시물입니다."));
+  } else {
+    const result = getProductsWithImageUrlArray(product)[0];
+    res.send({ ok: true, result });
+  }
 }));
 
 
