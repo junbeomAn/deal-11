@@ -14,7 +14,7 @@ const insertLikeQuery = `INSERT INTO USER_LIKE_PRODUCT(user_id, product_id) VALU
 const selectProductDetailQuery = (user) => {
   const user_id = user.userId;
   let returnQuery = `
-  SELECT a.id, a.title, a.content, a.image_url, a.price, b.name AS location, IF(COUNT(c.user_id)>0, true, false) AS user_like 
+  SELECT a.id, a.title, a.content, a.image_url, a.price, b.name AS location, IF(COUNT(c.user_id)>0, true, false) AS user_like, IF(a.user_id=${user_id}, true, false) AS authorized
   FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id = b.id LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id = a.id AND c.user_id = ${user_id} 
   WHERE a.id = ? GROUP BY a.id`;
   return returnQuery;
