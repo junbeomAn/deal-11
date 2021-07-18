@@ -25,13 +25,13 @@ const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
     if (!req.session.user) {
-      cb(createError(401, '로그인을 해주세요.'));
+      return cb(createError(401, '로그인을 해주세요.'), true);
     }
     if (file.mimetype.substring(0, 5) !== 'image') {
-      cb(createError(400, '지원하지 않는 파일 형식입니다.'));
+      return cb(createError(400, '지원하지 않는 파일 형식입니다.'));
     }
     if (/;+/.test(file.originalname)) {
-      cb(createError(400, "';'는 지원하지 않는 파일명 입니다."));
+      return cb(createError(400, "';'는 지원하지 않는 파일명 입니다."));
     }
     cb(null, true);
   },
