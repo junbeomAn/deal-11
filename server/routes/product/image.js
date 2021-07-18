@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const multer = require('multer');
+const crypto = require('crypto');
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
@@ -8,7 +9,15 @@ const storage = multer.diskStorage({
     cb(null, 'public/images');
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const MIME_TYPE_MAP = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/svg+xml': 'svg',
+    };
+    let ext = '.' + MIME_TYPE_MAP[file.mimetype];
+    const hash = crypto.randomBytes(18).toString('hex');
+    cb(null, hash + Date.now() + ext);
   },
 });
 
