@@ -30,7 +30,8 @@ function runAsyncWrapper(callback) {
 
 function requiredLoginDecorator(req, next) {
   return function () {
-    if (!req.session.user) next(createError(404, '로그인을 해주세요.'));
+    if (!req.session.user) next(createError(401, '로그인을 해주세요.'));
+    else return true;
   };
 }
 

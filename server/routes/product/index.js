@@ -44,19 +44,20 @@ router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // qu
 
 
 router.get('/mine', runAsyncWrapper(async (req, res, next) => {
-  requiredLoginDecorator(req, next)();
-  const { user } = req.session;
-  const { page = 1 } = req.query;
-  const arguments = [user.userId, String((page-1)*10)];
-  
-  const [products] = await pool.execute(selectMyProductQuery(), arguments);
-  const result = getProductsWithImageUrlArray(products);
-  res.json({ ok: true, result });
+  const isAuthorized = requiredLoginDecorator(req, next)();
+  if(isAuthorized) {
+    const { user } = req.session;
+    const { page = 1 } = req.query;
+    const arguments = [user.userId, String((page-1)*10)];
+    
+    const [products] = await pool.execute(selectMyProductQuery(), arguments);
+    const result = getProductsWithImageUrlArray(products);
+    res.json({ ok: true, result });
+  }
 }));
 
 router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
-  if (isNaN(parseInt(productId))) next();
   const { user } = req.session;
   const arguments = [productId];
   
@@ -73,31 +74,37 @@ router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
 // upload.array 로 여러개 받을수 있음. product-images는 client input 태그의 name 속성과 일치시킨다.
 // 업로드 된 파일은 req.files에 배열형태로 저장된다.
 // 필요한 json 데이터는 String으로 전달하여 전달받아 server에서 parsing한다.
-router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
+router.post('/', runAsyncWrapper(async (req, res, next) => {
   // front html form 에서 input field name => product-images
-  requiredLoginDecorator(req, next)();
-  const { userId } = req.session.user;
-  const { title, content, category_id, price, location } = JSON.parse(req.body.json);
-  const image_url = makeImageUrlString(req.files);
-  const location_id = await selectOrInsertLocation(location);
-  const arguments = [title, content, userId, category_id, image_url, price, location_id];
+  const isAuthorized = requiredLoginDecorator(req, next)();
+  
+  if (isAuthorized) {
+    upload.array('product-images');
+    const { userId } = req.session.user;
+    const { title, content, category_id, price, location } = JSON.parse(req.body.json);
+    const image_url = makeImageUrlString(req.files);
+    const location_id = await selectOrInsertLocation(location);
+    const arguments = [title, content, userId, category_id, image_url, price, location_id];
 
-  const [result] = await pool.execute(insertProductQuery, arguments);
-  res.send({ ok: true, detail_id: result.insertId });
+    const [result] = await pool.execute(insertProductQuery, arguments);
+    res.send({ ok: true, detail_id: result.insertId });
+  }
 }));
 
 router.post('/like/:productId', runAsyncWrapper(async (req, res, next) => {
-  requiredLoginDecorator(req, next)();
-  const { userId } = req.session.user;
-  const { productId } = req.params;
-  const arguments = [userId, productId];
+  const isAuthorized = requiredLoginDecorator(req, next)();
+  if (isAuthorized){
+    const { userId } = req.session.user;
+    const { productId } = req.params;
+    const arguments = [userId, productId];
 
-  const [result] = await pool.execute(deleteLikeQuery, arguments);
-  if (result.affectedRows) {
-    res.send({ like: false });
-  } else {
-    await pool.execute(insertLikeQuery, arguments);
-    res.status(201).json({ like: true });
+    const [result] = await pool.execute(deleteLikeQuery, arguments);
+    if (result.affectedRows) {
+      res.send({ like: false });
+    } else {
+      await pool.execute(insertLikeQuery, arguments);
+      res.status(201).json({ like: true });
+    }
   }
 }));
 
