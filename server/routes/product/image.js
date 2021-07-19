@@ -1,5 +1,6 @@
 const createError = require('http-errors');
 const multer = require('multer');
+const crypto = require('crypto');
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
@@ -8,18 +9,29 @@ const storage = multer.diskStorage({
     cb(null, 'public/images');
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const MIME_TYPE_MAP = {
+      'image/png': 'png',
+      'image/jpeg': 'jpg',
+      'image/jpg': 'jpg',
+      'image/svg+xml': 'svg',
+    };
+    let ext = '.' + MIME_TYPE_MAP[file.mimetype];
+    const hash = crypto.randomBytes(18).toString('hex');
+    cb(null, hash + Date.now() + ext);
   },
 });
 
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
+    if (!req.session.user) {
+      return cb(createError(401, '로그인을 해주세요.'), true);
+    }
     if (file.mimetype.substring(0, 5) !== 'image') {
-      cb(createError(400, '지원하지 않는 파일 형식입니다.'));
+      return cb(createError(400, '지원하지 않는 파일 형식입니다.'));
     }
     if (/;+/.test(file.originalname)) {
-      cb(createError(400, "';'는 지원하지 않는 파일명 입니다."));
+      return cb(createError(400, "';'는 지원하지 않는 파일명 입니다."));
     }
     cb(null, true);
   },
@@ -58,4 +70,5 @@ module.exports = {
   upload,
   makeImageUrlString,
   getProductsWithImageUrlArray,
+  parseImageUrlStringToArray,
 };
