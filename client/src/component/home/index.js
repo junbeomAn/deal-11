@@ -1,5 +1,5 @@
 import Component from '../../core/Component';
-
+import { $router } from '../../lib/router';
 import Modal from './Modal';
 import ToggleMenu from './ToggleMenu';
 
@@ -73,13 +73,14 @@ class Home extends Component {
   }
   setEvent() {
     this.addEvent('click', '.my-info-btn', () => {
-      this.store.dispatch('loginReverse').then(() => {
-        this.setState({
-          login: this.store.getState('isLogin'),
-        });
-      });
+      $router.push('/auth', 1);
     });
-
+    this.addEvent('click', '.category-btn', () => {
+      $router.push('/category', 2);
+    });
+    this.addEvent('click', '.menu-btn', () => {
+      $router.push('/menu', 1);
+    });
     this.addEvent('click', '.plus-btn', () => {
       const modal = this.$target.querySelector('.modal-wrapper');
       let prevModalOn = this.store.getState('homeModal');
