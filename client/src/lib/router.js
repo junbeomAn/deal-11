@@ -1,16 +1,17 @@
 import { isClass } from '../utils.js';
+import { routeEvent } from './event';
 /**
  * **DO NOT MODIFY THIS FILE**
  */
 class Router {
   $app = null;
   routes = null;
-  routeEvent = null;
   store = null;
-  constructor({ $app, routes, routeEvent, store }) {
+  routePush = false;
+  moveHistory = [];
+  constructor({ $app, routes, store }) {
     this.$app = $app;
     this.fallback = '/';
-    this.routeEvent = routeEvent;
     this.store = store;
     this.generateRoutes(routes);
     this.initEvent();
@@ -40,7 +41,7 @@ class Router {
     const component = this.getComponent(route);
     if (isClass(component)) {
       new component(this.$app, {}, this.store);
-      this.$app.dispatchEvent(this.routeEvent);
+      this.$app.dispatchEvent(routeEvent);
     } else {
       throw new Error(`Invalid component`);
     }
@@ -69,7 +70,9 @@ class Router {
       this.render(route);
     }
   }
-  push(path) {
+  push(path, moveTo = 0) {
+    this.routePush = true;
+    this.moveHistory.push(moveTo);
     window.location.hash = path;
   }
 }

@@ -30,7 +30,6 @@ const routes = [
   { path: '/category', component: Category },
   { path: '/menu', component: Menu },
 ];
-const routeEvent = new CustomEvent('route');
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
 let scrollHeight = 0;
@@ -72,6 +71,6 @@ $app.addEventListener('scroll', () => {
   scrollHandler();
 });
 async function init() {
-  initRouter({ $app, routes, routeEvent, store });
+  initRouter({ $app, routes, store });
 }
 init();
