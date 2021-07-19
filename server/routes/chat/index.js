@@ -4,10 +4,12 @@ const createError = require('http-errors');
 const pool = require('../../db/index.js');
 const { runAsyncWrapper } = require('../utils.js');
 const {
+  selectChatAuthorized,
   insertMessageQuery,
   selectExistRoomQuery,
   selectChatRoomValidQuery,
   insertChatRoomQuery,
+  deleteChatRoomQuery,
 } = require('../query.js');
 
 const router = express.Router();
@@ -51,6 +53,21 @@ router.get(
   '/:roomId',
   runAsyncWrapper(async (req, res, next) => {
     res.send({ ok: true });
+  })
+);
+router.delete(
+  '/:roomId',
+  runAsyncWrapper(async (req, res, next) => {
+    const { roomId } = req.params;
+    const { userId } = req.session.user;
+    const [check] = await pool.execute(selectChatAuthorized(roomId, userId));
+    console.log(check);
+    if (check[0].authorized) {
+      await pool.execute(deleteChatRoomQuery, [roomId]);
+      res.send({ ok: true });
+    } else {
+      next(createError(401, '삭제 권한 없음'));
+    }
   })
 );
 
