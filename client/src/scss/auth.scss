@@ -1,0 +1,22 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+.auth-wrapper {
+  height: 2102px;
+}
+
+.auth-default {
+  display: flex;
+  flex-direction: column;
+  height: $auth-small-height;
+  justify-content: space-between;
+}
+
+.section-content {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+}

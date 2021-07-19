@@ -1,8 +1,13 @@
 import { initRouter, $router } from './lib/router.js';
 import Home from './component/home';
-import MyInfo from './component/auth';
-import store from './store';
+import Auth from './component/auth';
+import SignUp from './component/auth/SignUp';
+import SignIn from './component/auth/SignIn';
+import Category from './component/category';
+import Menu from './component/menu';
+
 import './scss/app.scss';
+import store from './store';
 
 /**
  * route
@@ -19,7 +24,11 @@ import './scss/app.scss';
 const routes = [
   { path: '/', redirect: '/home' },
   { path: '/home', component: Home },
-  { path: '/myinfo', component: MyInfo },
+  { path: '/auth', component: Auth },
+  { path: '/signin', component: SignIn },
+  { path: '/signup', component: SignUp },
+  { path: '/category', component: Category },
+  { path: '/menu', component: Menu },
 ];
 const routeEvent = new CustomEvent('route');
 const $app = document.querySelector('#app');

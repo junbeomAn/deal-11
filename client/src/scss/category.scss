@@ -1,0 +1,36 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+$category-image-width: 50px;
+$category-image-height: 50px;
+$category-grid-height: 100px;
+$category-grid-row-gap: 20px;
+
+.category-content {
+  padding: 20px 30px;
+  ul {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-row-gap: $category-grid-row-gap;
+    li {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      cursor: pointer;
+      height: $category-grid-height;
+      &:hover {
+        .image-box {
+          @include popup-style($button-radius);
+        }
+      }
+      .image-box {
+        width: $category-image-width;
+        height: $category-image-height;
+        border: 1px solid $line-grey;
+        background-color: $off-white;
+        border-radius: $button-radius;
+      }
+    }
+  }
+}

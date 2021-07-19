@@ -1,0 +1,29 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+.input {
+  border-radius: 8px;
+  &:focus {
+    outline: none;
+  }
+  &.large {
+    width: 290px;
+    height: 40px;
+    padding: 10px 16px 8px;
+  }
+  &.medium {
+    width: 256px;
+    height: 36px;
+    padding: 8px;
+  }
+  &.initial,
+  &.filled {
+    border: 1px solid $line-grey;
+  }
+  &.active {
+    border: 1px solid $baemin-primary;
+  }
+  &.typing {
+    border: 1px solid $baemin-primary;
+  }
+}
