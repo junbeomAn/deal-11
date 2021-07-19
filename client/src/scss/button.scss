@@ -1,0 +1,40 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+button {
+  color: $default-white;
+  border-radius: $button-radius;
+
+  &.large {
+    @include button-large();
+  }
+  &.small {
+    @include button-small();
+  }
+  &.primary {
+    background-color: $baemin-primary;
+  }
+  &.secondary {
+    background-color: $baemin-secondary;
+  }
+  &.third {
+    background-color: $baemin-third;
+  }
+  &.rectangle:hover {
+    background-color: $baemin-third;
+  }
+  &.transparent {
+    background-color: transparent;
+    color: $title-black;
+  }
+
+  &.text-large {
+    font-size: $text-large;
+  }
+  &.text-medium {
+    font-size: $text-medium;
+  }
+  &.text-small {
+    font-size: $text-small;
+  }
+}

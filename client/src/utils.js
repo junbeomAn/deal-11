@@ -5,4 +5,10 @@ function isClass(value) {
 function isPromise(value) {
   return value instanceof Promise;
 }
-export { isClass, isPromise };
+
+const BASE_URL = 'http://localhost:3000';
+
+const combineWithQueryString = (url, qs) => {
+  return url + new URLSearchParams(qs);
+};
+export { isClass, isPromise, BASE_URL, combineWithQueryString };

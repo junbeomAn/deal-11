@@ -3,3 +3,34 @@ $danger: #dc3545;
 $primary: #0d6efd;
 $baemin: #5ebebb;
 $baemin_dark: #50adaa;
+
+// Figma 컴포넌트별 컬러
+$off-white: #f6f6f6;
+$line-grey: #d7d7d7;
+$default-white: #fff;
+$placeholder-grey: #bbbbbb;
+$content-grey: #888888;
+$title-black: #222222;
+$baemin-primary: #2ac1bc;
+$baemin-secondary: #a0e1e0;
+$baemin-third: #219a95;
+$baemin-error: #f45452;
+
+//
+@mixin popup-style($radius) {
+  box-shadow: 0px 0px 4px rgba(204, 204, 204, 0.5),
+    0px 2px 4px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+  border-radius: 10px;
+}
+@mixin input-error-style($top) {
+  width: $large-width;
+  position: absolute;
+  top: $top;
+  font-size: 12px;
+  color: $baemin-error;
+  text-align: center;
+  &.hidden {
+    display: none;
+  }
+}
