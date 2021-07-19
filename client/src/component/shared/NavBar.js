@@ -2,13 +2,19 @@ import Component from '../../core/Component';
 import arrowIcon from '../../assets/arrow_back.svg';
 import doneIcon from '../../assets/done.svg';
 
+import '../../scss/navbar.scss';
+
 export default class NavBarWrapper extends Component {
   template() {
-    return `<div class="navbar-wrapper"></div>`;
+    const { background, border } = this.$props;
+    return `
+     <div class="nav-bar-shared ${background || ''} ${border || ''}">
+     </div>
+     `;
   }
   mounted() {
     new NavBar(
-      this.$target.querySelector('.navbar-wrapper'),
+      this.$target.querySelector('.nav-bar-shared'),
       this.$props,
       this.store
     );
@@ -17,10 +23,9 @@ export default class NavBarWrapper extends Component {
 
 class NavBar extends Component {
   template() {
-    const { title, right, backGround } = this.$props;
+    const { title, right, onBackClick } = this.$props;
     return `
-      <div class="nav-bar-shared ${backGround || ''}">
-        <button class="nav-bar-btn">
+        <button class="nav-bar-btn" >
           <img src=${arrowIcon} alt="go-back">
         </button>
         <div class="title">
@@ -35,7 +40,15 @@ class NavBar extends Component {
           `
             : ''
         }
-      </div>
+      
     `;
+  }
+  handleBackClick(e) {
+    if (!e.target.closest('.nav-bar-btn')) return;
+    history.back();
+  }
+  setEvent() {
+    this.handleBackClick = this.handleBackClick.bind(this);
+    this.addEvent('click', '.nav-bar-shared', this.handleBackClick);
   }
 }
