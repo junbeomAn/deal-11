@@ -1,0 +1,45 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+.nav-bar-shared {
+  min-width: $min-width;
+  max-width: $max-width;
+  height: $nav-height;
+  border-bottom: $border-weight solid $line-grey;
+  position: relative;
+  display: flex;
+  align-items: center;
+  .nav-bar-btn {
+    justify-self: flex-start;
+    margin: 1.5rem;
+    img {
+      width: 20px;
+      height: 20px;
+    }
+    &:last-child {
+      justify-self: flex-end;
+    }
+  }
+  .title {
+    font: {
+      size: $text-medium;
+    }
+    position: absolute;
+    left: 50%;
+    // top: 5rem;
+    transform: translate(-50%, 20%);
+    top: 1.5rem;
+  }
+  &.grey,
+  &.gray {
+    background: {
+      color: $off-white;
+    }
+  }
+  &.transparent {
+    background-color: transparent;
+  }
+  &.no-border {
+    border: $border-weight solid transparent;
+  }
+}
