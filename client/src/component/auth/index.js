@@ -34,7 +34,7 @@ export default class Auth extends Component {
     if (isLogin) {
       new Default($auth, { username }, this.store);
     } else {
-      $router.push('/signin');
+      $router.redirect('/signin');
     }
   }
   setup() {

@@ -1,16 +1,17 @@
 import { isClass } from '../utils.js';
+import { routeEvent } from './event';
 /**
  * **DO NOT MODIFY THIS FILE**
  */
 class Router {
   $app = null;
   routes = null;
-  routeEvent = null;
   store = null;
-  constructor({ $app, routes, routeEvent, store }) {
+  routePush = false;
+  moveHistory = [];
+  constructor({ $app, routes, store }) {
     this.$app = $app;
     this.fallback = '/';
-    this.routeEvent = routeEvent;
     this.store = store;
     this.generateRoutes(routes);
     this.initEvent();
@@ -37,15 +38,19 @@ class Router {
     return component;
   }
   render(route) {
+    console.log(history.length);
     const component = this.getComponent(route);
     if (isClass(component)) {
       new component(this.$app, {}, this.store);
-      this.$app.dispatchEvent(this.routeEvent);
+      this.$app.dispatchEvent(routeEvent);
     } else {
       throw new Error(`Invalid component`);
     }
   }
-
+  redirect(path) {
+    history.replaceState(null, '', '/#' + path);
+    this.onHashChangeHandler();
+  }
   onHashChangeHandler() {
     this.$app.innerHTML = '';
     const hash = window.location.hash;
@@ -54,7 +59,7 @@ class Router {
       ? this.getRoute(path)
       : this.getRoute(this.fallback);
     if (route.redirect) {
-      this.push(route.redirect);
+      this.redirect(route.redirect);
       return;
     }
     if (route.middleware) {
@@ -69,7 +74,9 @@ class Router {
       this.render(route);
     }
   }
-  push(path) {
+  push(path, moveTo = 0) {
+    this.routePush = true;
+    this.moveHistory.push(moveTo);
     window.location.hash = path;
   }
 }
@@ -84,6 +91,7 @@ export function initRouter(options) {
   const router = new Router(options);
   $router = {
     push: (path) => router.push(path),
+    redirect: (path) => router.redirect(path),
   };
   router.onHashChangeHandler();
 }
