@@ -14,6 +14,15 @@ const insertLikeQuery = `INSERT INTO USER_LIKE_PRODUCT(user_id, product_id) VALU
 const updateProductQuery = `UPDATE PRODUCTS SET title = ?, content = ?, image_url = ?, price = ?, location_id = ? WHERE id = ?`;
 const deleteProductQuery = `DELETE FROM PRODUCTS WHERE id = ?`;
 const selectIsAuthorized = `SELECT IF(user_id = ?, 1, 0) AS authorized, image_url FROM PRODUCTS WHERE id = ?`;
+const selectChatRoomValidQuery = `SELECT IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS isSeller, IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS sellerHas`;
+const insertChatRoomQuery = `INSERT INTO CHAT_ROOMS(product_id, seller_id, buyer_id) VALUES (?, ?, ?)`;
+const insertMessageQuery = (productId, userId, toId, content) => {
+  const selectChatRoomQuery = `SELECT id FROM CHAT_ROOMS WHERE product_id = ${productId} AND ((seller_id = ${toId} AND buyer_id = ${userId}) OR (seller_id = ${userId} AND buyer_id = ${toId}))`;
+  return `INSERT INTO MESSAGES(chat_id, sender_id, content) VALUES ((${selectChatRoomQuery}), ${userId}, '${content}')`;
+};
+const selectExistRoomQuery = (productId, userId, toId) => {
+  return `SELECT COUNT(*) AS exist FROM CHAT_ROOMS WHERE product_id = ${productId} AND ((seller_id = ${userId} AND buyer_id = ${toId}) OR (buyer_id = ${userId} AND seller_id = ${toId}))`;
+};
 const selectProductDetailQuery = (user) => {
   const user_id = user.userId;
   let returnQuery = `
@@ -64,8 +73,12 @@ module.exports = {
   selectIsAuthorized,
   updateProductQuery,
   deleteProductQuery,
+  selectChatRoomValidQuery,
+  insertChatRoomQuery,
+  selectExistRoomQuery,
   selectProductDetailQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
   selectMyProductQuery,
+  insertMessageQuery,
 };
