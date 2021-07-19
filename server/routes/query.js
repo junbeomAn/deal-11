@@ -32,6 +32,21 @@ const selectChatRoomAllQuery = (userId) => {
    WHERE ${userId} IN (room.seller_id, room.buyer_id)
   `;
 };
+const selectProductForChatQuery = (roomId) => {
+  return `
+    SELECT product.image_url, product.title, product.price 
+    FROM PRODUCTS AS product, CHAT_ROOMS AS room 
+    WHERE room.id = ${roomId} AND room.product_id = product.id
+  `;
+};
+const selectChatRoomDetailQuery = (userId, roomId) => {
+  return `
+    SELECT content, 'read',
+    IF(sender_id = ${userId}, 1, 0) AS mine
+    FROM MESSAGES 
+    WHERE chat_id = ${roomId}
+  `;
+};
 const selectChatAuthorized = (roomId, userId) => {
   return `SELECT IF(EXISTS(SELECT id FROM CHAT_ROOMS WHERE id = ${roomId} AND (seller_id = ${userId} OR buyer_id = ${userId})), 1, 0) AS authorized`;
 };
@@ -103,4 +118,6 @@ module.exports = {
   insertMessageQuery,
   selectChatAuthorized,
   selectChatRoomAllQuery,
+  selectChatRoomDetailQuery,
+  selectProductForChatQuery,
 };

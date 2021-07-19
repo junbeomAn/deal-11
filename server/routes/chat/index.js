@@ -12,6 +12,8 @@ const {
   insertChatRoomQuery,
   deleteChatRoomQuery,
   selectChatRoomAllQuery,
+  selectChatRoomDetailQuery,
+  selectProductForChatQuery,
 } = require('../query.js');
 
 const router = express.Router();
@@ -71,7 +73,32 @@ router.post(
 router.get(
   '/:roomId',
   runAsyncWrapper(async (req, res, next) => {
-    res.send({ ok: true });
+    const connection = await pool.getConnection(async (conn) => conn);
+    try {
+      const { userId } = req.session.user;
+      const { roomId } = req.params;
+      const [check] = await connection.query(
+        selectChatAuthorized(roomId, userId)
+      );
+      if (check[0].authorized) {
+        const [messages] = await connection.query(
+          selectChatRoomDetailQuery(userId, roomId)
+        );
+        const [prevProduct] = await connection.query(
+          selectProductForChatQuery(roomId)
+        );
+        console.log(prevProduct);
+        const product = getProductsWithImageUrlArray(prevProduct);
+        res.send({ ok: true, messages, product });
+      } else {
+        next(createError(401, '권한 없음'));
+      }
+    } catch (err) {
+      console.log(err);
+      next(createError(500, err.message));
+    } finally {
+      connection.release();
+    }
   })
 );
 router.delete(
