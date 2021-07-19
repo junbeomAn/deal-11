@@ -38,6 +38,7 @@ class Router {
     return component;
   }
   render(route) {
+    console.log(history.length);
     const component = this.getComponent(route);
     if (isClass(component)) {
       new component(this.$app, {}, this.store);
@@ -46,7 +47,10 @@ class Router {
       throw new Error(`Invalid component`);
     }
   }
-
+  redirect(path) {
+    history.replaceState(null, '', '/#' + path);
+    this.onHashChangeHandler();
+  }
   onHashChangeHandler() {
     this.$app.innerHTML = '';
     const hash = window.location.hash;
@@ -55,7 +59,7 @@ class Router {
       ? this.getRoute(path)
       : this.getRoute(this.fallback);
     if (route.redirect) {
-      this.push(route.redirect);
+      this.redirect(route.redirect);
       return;
     }
     if (route.middleware) {
@@ -87,6 +91,7 @@ export function initRouter(options) {
   const router = new Router(options);
   $router = {
     push: (path) => router.push(path),
+    redirect: (path) => router.redirect(path),
   };
   router.onHashChangeHandler();
 }

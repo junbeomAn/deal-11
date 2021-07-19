@@ -23,7 +23,7 @@ import store from './store';
  */
 const routes = [
   { path: '/', redirect: '/home' },
-  { path: '/home', component: Home },
+  { path: '/home', component: Home, middleware: test },
   { path: '/auth', component: Auth },
   { path: '/signin', component: SignIn },
   { path: '/signup', component: SignUp },
@@ -37,8 +37,17 @@ let remainScroll = 0;
 let scrollRange = 0;
 let scrollTimeOut = null;
 
+function test() {
+  if (!store.getState('isLogin')) {
+    $router.redirect('/signin');
+    return false;
+  } else {
+    return true;
+  }
+}
 function setScrollBar() {
   const pageRootElem = document.querySelector('#app > *');
+  if (!pageRootElem) return;
   const { height } = pageRootElem.getBoundingClientRect();
   if (height) scrollHeight = window.innerHeight * (window.innerHeight / height);
   remainScroll = window.innerHeight - scrollHeight;
