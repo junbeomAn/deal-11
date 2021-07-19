@@ -14,6 +14,7 @@ const {
   selectChatRoomAllQuery,
   selectChatRoomDetailQuery,
   selectProductForChatQuery,
+  updateReadMessageQuery,
 } = require('../query.js');
 
 const router = express.Router();
@@ -81,13 +82,13 @@ router.get(
         selectChatAuthorized(roomId, userId)
       );
       if (check[0].authorized) {
+        await connection.query(updateReadMessageQuery(roomId, userId));
         const [messages] = await connection.query(
           selectChatRoomDetailQuery(userId, roomId)
         );
         const [prevProduct] = await connection.query(
           selectProductForChatQuery(roomId)
         );
-        console.log(prevProduct);
         const product = getProductsWithImageUrlArray(prevProduct);
         res.send({ ok: true, messages, product });
       } else {

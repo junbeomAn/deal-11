@@ -17,6 +17,11 @@ const selectIsAuthorized = `SELECT IF(user_id = ?, 1, 0) AS authorized, image_ur
 const selectChatRoomValidQuery = `SELECT IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS isSeller, IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS sellerHas`;
 const insertChatRoomQuery = `INSERT INTO CHAT_ROOMS(product_id, seller_id, buyer_id) VALUES (?, ?, ?)`;
 const deleteChatRoomQuery = `DELETE FROM CHAT_ROOMS WHERE id = ?`;
+const updateReadMessageQuery = (roomId, userId) => {
+  return `
+    UPDATE MESSAGES SET MESSAGES.read = 1 WHERE chat_id = ${roomId} AND NOT sender_id = ${userId}
+  `;
+};
 const selectChatRoomAllQuery = (userId) => {
   return `
    SELECT room.id, 
@@ -41,7 +46,7 @@ const selectProductForChatQuery = (roomId) => {
 };
 const selectChatRoomDetailQuery = (userId, roomId) => {
   return `
-    SELECT content, 'read',
+    SELECT content, MESSAGES.read,
     IF(sender_id = ${userId}, 1, 0) AS mine
     FROM MESSAGES 
     WHERE chat_id = ${roomId}
@@ -120,4 +125,5 @@ module.exports = {
   selectChatRoomAllQuery,
   selectChatRoomDetailQuery,
   selectProductForChatQuery,
+  updateReadMessageQuery,
 };
