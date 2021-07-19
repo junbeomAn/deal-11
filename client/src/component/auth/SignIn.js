@@ -147,7 +147,7 @@ class Form extends Component {
             e.preventDefault();
             if (!e.target.closest('.signup-button-wrapper button')) return;
 
-            $router.push('/signup');
+            $router.push('/signup', 1);
           },
         },
       },

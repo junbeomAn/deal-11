@@ -45,6 +45,7 @@ body {
     overflow-y: scroll;
     > * {
       width: 100%;
+      background-color: white;
     }
     &.push {
       overflow: hidden;
