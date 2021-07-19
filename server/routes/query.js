@@ -60,9 +60,9 @@ const selectExistRoomQuery = (productId, userId, toId) => {
 const selectProductDetailQuery = (user) => {
   const user_id = user.userId;
   let returnQuery = `
-  SELECT a.id, a.title, a.content, a.image_url, a.created_at, a.price, b.name AS location, IF(COUNT(c.user_id)>0, true, false) AS user_like, IF(a.user_id=${user_id}, true, false) AS authorized
+  SELECT a.id, a.title, a.content, e.username AS seller_name, e.id AS seller_id, a.image_url, a.created_at, a.price, b.name AS location, IF(COUNT(c.user_id)>0, true, false) AS user_like, IF(a.user_id=${user_id}, true, false) AS authorized
   , d.name AS category
-  FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id = b.id INNER JOIN CATEGORIES AS d ON d.id = a.category_id 
+  FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id = b.id INNER JOIN CATEGORIES AS d ON d.id = a.category_id INNER JOIN USERS AS e ON e.id = a.user_id 
   LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id = a.id AND c.user_id = ${user_id} 
   WHERE a.id = ? GROUP BY a.id`;
   return returnQuery;
