@@ -13,6 +13,7 @@ const {
   insertLikeQuery,
   selectIsAuthorized,
   updateProductQuery,
+  deleteProductQuery,
   selectProductDetailQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
@@ -101,6 +102,26 @@ router.put('/:productId', upload.array('product-images'), runAsyncWrapper(async 
   const [result] = await pool.execute(updateProductQuery, arguments);
   res.send({ ok: true });
 }));
+
+router.delete('/:productId', runAsyncWrapper(async (req, res, next) => {
+  const isLogin = requiredLoginDecorator(req, next)();
+  if (isLogin) {
+    const { productId } = req.params;
+    const { userId } = req.session.user;
+    const arguments = [userId, productId];
+    const [check] = await pool.execute(selectIsAuthorized, arguments);
+    if (check[0].authorized) {
+      const images = parseImageUrlStringToArray(check[0].image_url);
+      images.forEach(img => {
+        fs.unlinkSync(appPublic + img);
+      })
+      await pool.execute(deleteProductQuery, [productId]);
+      res.send({ ok: true });
+    } else {
+      next(createError(401, '삭제 권한 없음'));
+    }
+  }
+}))
 
 
 // upload.array 로 여러개 받을수 있음. product-images는 client input 태그의 name 속성과 일치시킨다.
