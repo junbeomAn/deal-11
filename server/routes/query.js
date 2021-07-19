@@ -17,6 +17,21 @@ const selectIsAuthorized = `SELECT IF(user_id = ?, 1, 0) AS authorized, image_ur
 const selectChatRoomValidQuery = `SELECT IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS isSeller, IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS sellerHas`;
 const insertChatRoomQuery = `INSERT INTO CHAT_ROOMS(product_id, seller_id, buyer_id) VALUES (?, ?, ?)`;
 const deleteChatRoomQuery = `DELETE FROM CHAT_ROOMS WHERE id = ?`;
+const selectChatRoomAllQuery = (userId) => {
+  return `
+   SELECT room.id, 
+   IF(room.seller_id = ${userId}, 
+    (SELECT username FROM USERS WHERE id = room.buyer_id), 
+    (SELECT username FROM USERS WHERE id = room.seller_id)
+   ) AS sender,
+   (SELECT image_url FROM PRODUCTS WHERE id = room.product_id) AS image_url,
+   (SELECT COUNT(*) FROM MESSAGES WHERE chat_id = room.id AND 'read' = 0 AND NOT sender_id = ${userId}) AS unread, 
+   (SELECT content FROM MESSAGES WHERE chat_id = room.id ORDER BY created_at DESC LIMIT 1) AS last_content,
+   (SELECT created_at FROM MESSAGES WHERE chat_id = room.id ORDER BY created_at DESC LIMIT 1) AS last_date
+   FROM CHAT_ROOMS AS room 
+   WHERE ${userId} IN (room.seller_id, room.buyer_id)
+  `;
+};
 const selectChatAuthorized = (roomId, userId) => {
   return `SELECT IF(EXISTS(SELECT id FROM CHAT_ROOMS WHERE id = ${roomId} AND (seller_id = ${userId} OR buyer_id = ${userId})), 1, 0) AS authorized`;
 };
@@ -87,4 +102,5 @@ module.exports = {
   selectMyProductQuery,
   insertMessageQuery,
   selectChatAuthorized,
+  selectChatRoomAllQuery,
 };

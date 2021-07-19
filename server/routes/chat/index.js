@@ -3,6 +3,7 @@ const createError = require('http-errors');
 
 const pool = require('../../db/index.js');
 const { runAsyncWrapper } = require('../utils.js');
+const { getProductsWithImageUrlArray } = require('../product/image.js');
 const {
   selectChatAuthorized,
   insertMessageQuery,
@@ -10,10 +11,28 @@ const {
   selectChatRoomValidQuery,
   insertChatRoomQuery,
   deleteChatRoomQuery,
+  selectChatRoomAllQuery,
 } = require('../query.js');
 
 const router = express.Router();
 
+router.get(
+  '/',
+  runAsyncWrapper(async (req, res, next) => {
+    const connection = await pool.getConnection(async (conn) => conn);
+    try {
+      const { userId } = req.session.user;
+      const [result] = await connection.query(selectChatRoomAllQuery(userId));
+      const rooms = getProductsWithImageUrlArray(result);
+      res.send({ ok: true, rooms });
+    } catch (err) {
+      console.log(err);
+      next(createError(500, err.message));
+    } finally {
+      connection.release();
+    }
+  })
+);
 router.post(
   '/message/:toId/:productId',
   runAsyncWrapper(async (req, res, next) => {
