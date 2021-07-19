@@ -8,8 +8,8 @@ export default class Componet {
     this.$props = $props;
     this.store = store;
     this.setup();
-    this.setEvent();
     this.render();
+    this.setEvent();
   }
 
   // state 정의
