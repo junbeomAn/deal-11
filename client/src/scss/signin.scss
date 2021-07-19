@@ -1,22 +1,22 @@
 @import 'size.scss';
 @import 'theme.scss';
 
-.auth-wrapper {
-  height: 2102px;
-}
-
-.auth-default {
+.signin-wrapper {
+  height: 300px;
   display: flex;
   flex-direction: column;
-  height: $auth-small-height;
   justify-content: space-between;
 }
 
-.section-content {
+.form-signin {
+  position: relative;
   width: 100%;
-  height: 50%;
+  height: 63%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-evenly;
+  .error-message-wrapper {
+    @include input-error-style(-7px);
+  }
 }
