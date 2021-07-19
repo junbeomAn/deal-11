@@ -135,7 +135,7 @@ router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res
   const arguments = [title, content, userId, category_id, image_url, price, location_id];
 
   const [result] = await pool.execute(insertProductQuery, arguments);
-  res.send({ ok: true, detail_id: result.insertId });
+  res.status(201).json({ ok: true, detail_id: result.insertId });
 
 }));
 
