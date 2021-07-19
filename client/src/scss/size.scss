@@ -6,3 +6,28 @@ $text-large: 18px;
 $text-medium: 16px;
 $text-small: 14px;
 $text-x-small: 12px;
+
+$auth-small-height: 250px;
+
+$large-width: 290px;
+$large-height: 42px;
+
+$small-width: 136px;
+$small-height: 36px;
+
+$button-radius: 8px;
+
+$border-weight: 2px;
+$border-weight-thin: 1px;
+
+@mixin button-large() {
+  width: 290px;
+  height: 42px;
+  padding: 10px 16px;
+}
+
+@mixin button-small() {
+  width: 136px;
+  height: 36px;
+  padding: 8px 16px;
+}

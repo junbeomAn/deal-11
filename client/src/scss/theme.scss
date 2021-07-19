@@ -14,6 +14,7 @@ $title-black: #222222;
 $baemin-primary: #2ac1bc;
 $baemin-secondary: #a0e1e0;
 $baemin-third: #219a95;
+$baemin-error: #f45452;
 
 //
 @mixin popup-style($radius) {
@@ -21,4 +22,15 @@ $baemin-third: #219a95;
     0px 2px 4px rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(4px);
   border-radius: 10px;
+}
+@mixin input-error-style($top) {
+  width: $large-width;
+  position: absolute;
+  top: $top;
+  font-size: 12px;
+  color: $baemin-error;
+  text-align: center;
+  &.hidden {
+    display: none;
+  }
 }
