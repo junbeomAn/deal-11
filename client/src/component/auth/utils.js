@@ -6,7 +6,7 @@ const inputThrottle = (callback) => {
   }
   timeout = setTimeout(() => {
     callback();
-    console.log('throttle?');
+    // console.log('throttle?');
     timeout = null;
   }, 600);
 };
