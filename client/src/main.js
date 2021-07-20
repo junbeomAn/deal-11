@@ -6,6 +6,7 @@ import SignIn from './component/auth/SignIn';
 import Category from './component/category';
 import Menu from './component/menu';
 import Animation from './component/animation';
+import Post from './component/post';
 
 import './scss/app.scss';
 import store from './store';
@@ -31,6 +32,7 @@ const routes = [
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
   { path: '/menu', component: Menu },
+  { path: '/post', component: Post },
 ];
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
