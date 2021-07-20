@@ -43,6 +43,11 @@ export default class SignUpWrapper extends Component {
 }
 
 class SignUp extends Component {
+  setup() {
+    this.$state = {
+      debounce: false,
+    };
+  }
   template() {
     return `  
         <div class="navbar-wrapper"></div>
@@ -64,6 +69,8 @@ class SignUp extends Component {
     this.$target
       .querySelector('.form-signup')
       .addEventListener('submit', (e) => {
+        if (this.$state.debounce) return;
+        this.$state.debounce = true;
         e.preventDefault();
         const header = {
           'Content-Type': 'application/json',
@@ -72,13 +79,21 @@ class SignUp extends Component {
           username: e.target.username.value,
           location: [e.target.location.value],
         };
-        console.log(API_ENDPOINT + '/auth/signup');
+        document.querySelector(
+          '.signup-button-wrapper > button'
+        ).disabled = true;
         promise(API_ENDPOINT + '/auth/signup', 'POST', header, body)
           .then((res) => {
             console.log(res);
           })
           .catch((err) => {
             console.log(err);
+          })
+          .finally(() => {
+            document.querySelector(
+              '.signup-button-wrapper > button'
+            ).disabled = false;
+            console.log(this);
           });
       });
   }
@@ -143,6 +158,7 @@ class Form extends Component {
           text: '회원가입',
           rectangle: true,
           eventTarget: '.signup-wrapper',
+          type: 'submit',
           onClick: (e) => {},
         },
       },
