@@ -5,6 +5,7 @@ import Input from '../shared/Input';
 import { $router } from '../../lib/router';
 import { inputChangeHandler, focusoutHandler } from './utils';
 import { BASE_URL } from '../../utils';
+import promise from '../../lib/api';
 import '../../scss/signup.scss';
 
 const api = {
@@ -60,6 +61,26 @@ class SignUp extends Component {
       this.store
     );
     new Form($form, {}, this.store);
+    this.$target
+      .querySelector('.form-signup')
+      .addEventListener('submit', (e) => {
+        e.preventDefault();
+        const header = {
+          'Content-Type': 'application/json',
+        };
+        const body = {
+          username: e.target.username.value,
+          location: [e.target.location.value],
+        };
+        console.log(API_ENDPOINT + '/auth/signup');
+        promise(API_ENDPOINT + '/auth/signup', 'POST', header, body)
+          .then((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
   }
 }
 
@@ -98,7 +119,7 @@ class Form extends Component {
           placeholder: '영문, 숫자 조합 20자 이하',
           id: 'username',
           eventTarget: '.signup-wrapper',
-          onChange: inputChangeHandler(this.store, 'username'),
+          onChange: () => {},
           onFocusout: focusoutHandler,
         },
       },
@@ -109,7 +130,7 @@ class Form extends Component {
           placeholder: '시, 구 제외, 동만 입력',
           id: 'location',
           eventTarget: '.signup-wrapper',
-          onChange: inputChangeHandler(this.store, 'location'),
+          onChange: () => {},
           onFocusout: focusoutHandler,
         },
       },
@@ -122,41 +143,7 @@ class Form extends Component {
           text: '회원가입',
           rectangle: true,
           eventTarget: '.signup-wrapper',
-          onClick: (e) => {
-            e.preventDefault();
-            if (!e.target.closest('.signup-button-wrapper button')) return;
-
-            const username = this.store.getState('username');
-            const location = this.store.getState('location');
-            const url = `${BASE_URL}/auth/signup`;
-
-            if (!username || !location) {
-              this.setState({
-                error: '아이디와 동네이름을 모두 입력 해주세요',
-              });
-              return;
-            }
-
-            api._signUp(url, { username, location }).then((res) => {
-              if (res.ok === true) {
-                this.store.dispatch('inputValue', {
-                  inputName: 'username',
-                  value: '',
-                });
-                this.store.dispatch('inputValue', {
-                  inputName: 'location',
-                  value: '',
-                });
-                this.setState({ error: '' });
-                $router.push('/signin');
-              } else {
-                this.setState({
-                  error: res.message,
-                });
-              }
-            });
-            // .finally(() => this.store.dispatch);
-          },
+          onClick: (e) => {},
         },
       },
     ]);
