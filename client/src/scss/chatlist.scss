@@ -1,0 +1,58 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+.chat-list-item {
+  border-bottom: $border-weight solid $line-grey;
+  cursor: pointer;
+
+  .content-wrapper {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    .info-box {
+      width: 100%;
+      .info-box-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        span {
+          &:first-child {
+            font-size: $text-large;
+          }
+          &:last-child {
+            font-size: $text-small;
+            color: $content-grey;
+          }
+        }
+      }
+      .info-box-bottom {
+        display: flex;
+        justify-content: space-between;
+        .pre-content {
+          color: $content-grey;
+        }
+        .unread-count-wrapper {
+          width: 25px;
+          height: 25px;
+          border-radius: 50%;
+          background-color: $baemin-third;
+          position: relative;
+          .unread-count {
+            color: $off-white;
+            position: absolute;
+            top: 45%;
+            left: 54%;
+            transform: translate(-50%, -50%);
+          }
+        }
+      }
+    }
+    .image-box {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #d7d7d7;
+      border-radius: 8px;
+      margin-left: 20px;
+    }
+  }
+}
