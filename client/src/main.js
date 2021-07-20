@@ -5,6 +5,7 @@ import SignUp from './component/auth/SignUp';
 import SignIn from './component/auth/SignIn';
 import Category from './component/category';
 import Menu from './component/menu';
+import Animation from './component/animation';
 
 import './scss/app.scss';
 import store from './store';
@@ -22,7 +23,8 @@ import store from './store';
  * - $router 객체를 이용해서 push 할 수 있습니다.
  */
 const routes = [
-  { path: '/', redirect: '/home' },
+  { path: '/', redirect: '/main' },
+  { path: '/main', component: Animation },
   { path: '/home', component: Home },
   { path: '/auth', component: Auth, middleware: loginMiddleWare },
   { path: '/signin', component: SignIn },
