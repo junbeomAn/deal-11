@@ -6,6 +6,7 @@ import ChatList from './ChatList';
 
 import { $router } from '../../lib/router';
 import { BASE_URL, combineWithQueryString } from '../../utils';
+import socket from '../Chat/socket';
 
 import 'moment/locale/ko';
 import '../../scss/menu.scss';
@@ -126,17 +127,23 @@ class Menu extends Component {
 
     if (active === 'salelist' || active === 'likelist') {
       action = 'setCurrentProduct';
-      next = `/product/${item.id}`;
+      // next = `/product/${item.id}`;
+      next = `/product`;
     } else if (active === 'chatlist') {
-      action = 'setCurrentChat';
-      next = `/chat/${item.id}`;
+      action = 'setCurrentChatInfo';
+      // next = `/chat/${item.id}`;
+      next = `/chatDetail`;
     }
     api.fetch(url).then((res) => {
       if (res.ok) {
         if (active === 'salelist' || active === 'likelist') {
           this.store.dispatch(action, res.result);
-          $router.push(next);
+        } else if (active === 'chatlist') {
+          const { messages, product } = res;
+          const chatInfo = this.store.getState('chatInfo');
+          this.store.dispatch(action, { messages, product, ...chatInfo });
         }
+        $router.push(next);
       }
     });
   }
@@ -165,8 +172,16 @@ class Menu extends Component {
     if (!e.target.closest('.chat-list .list-item')) return;
 
     const item = e.target.closest('.list-wrapper .list-item');
+    const sender = item.querySelector('.sender-name').textContent;
     const url = `${BASE_URL}/chat/${item.id}`;
     const { active } = this.$state;
+
+    this.setChatConnection(item.id);
+
+    this.store.dispatch('setCurrentChatInfo', {
+      room: item.id,
+      chatTarget: sender,
+    });
     this.getItem(url, active);
   }
 
@@ -177,6 +192,10 @@ class Menu extends Component {
     const url = `${BASE_URL}/product/${item.id}`;
     const { active } = this.$state;
     this.getItem(url, active);
+  }
+
+  setChatConnection(room) {
+    socket.emit('joinRoom', { room });
   }
 
   mounted() {
