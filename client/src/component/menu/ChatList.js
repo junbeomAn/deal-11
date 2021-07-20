@@ -2,6 +2,8 @@ import Component from '../../core/Component';
 import moment from 'moment';
 import { BASE_URL } from '../../utils';
 
+import '../../scss/chatlist.scss';
+
 export default class ChatList extends Component {
   setEvent() {
     const { onClick } = this.$props;
