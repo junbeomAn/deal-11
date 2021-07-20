@@ -1,6 +1,7 @@
 import Component from '../../core/Component';
 import arrowIcon from '../../assets/arrow_back.svg';
 import doneIcon from '../../assets/done.svg';
+import exitIcon from '../../assets/exit.svg';
 
 import '../../scss/navbar.scss';
 
@@ -23,7 +24,7 @@ export default class NavBarWrapper extends Component {
 
 class NavBar extends Component {
   template() {
-    const { title, right, onBackClick } = this.$props;
+    const { title, right } = this.$props;
     return `
         <button class="nav-bar-btn" >
           <img src=${arrowIcon} alt="go-back">
@@ -34,8 +35,8 @@ class NavBar extends Component {
         ${
           right
             ? `
-            <button class="nav-bar-btn>
-              <img src=${doneIcon} alt="post-product">
+            <button class="nav-bar-btn ${right === 'done' ? 'done' : 'exit'}">
+              <img src=${right === 'done' ? doneIcon : exitIcon} alt="next">
             </button>
           `
             : ''
@@ -48,7 +49,10 @@ class NavBar extends Component {
     history.back();
   }
   setEvent() {
+    const { handleRightClick } = this.$props;
     this.handleBackClick = this.handleBackClick.bind(this);
     this.addEvent('click', '.nav-bar-shared', this.handleBackClick);
+    if (handleRightClick)
+      this.addEvent('click', '.nav-bar-shared', handleRightClick);
   }
 }
