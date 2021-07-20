@@ -6,6 +6,7 @@ import SignIn from './component/auth/SignIn';
 import Category from './component/category';
 import Menu from './component/menu';
 import ChatDetail from './component/Chat/ChatDetail.js';
+import Animation from './component/animation';
 
 import './scss/app.scss';
 import store from './store';
@@ -23,16 +24,16 @@ import store from './store';
  * - $router 객체를 이용해서 push 할 수 있습니다.
  */
 const routes = [
-  { path: '/', redirect: '/home' },
+  { path: '/', redirect: '/main' },
+  { path: '/main', component: Animation },
   { path: '/home', component: Home },
-  { path: '/auth', component: Auth },
+  { path: '/auth', component: Auth, middleware: loginMiddleWare },
   { path: '/signin', component: SignIn },
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
   { path: '/menu', component: Menu },
   { path: '/chatDetail', component: ChatDetail },
 ];
-const routeEvent = new CustomEvent('route');
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
 let scrollHeight = 0;
@@ -40,8 +41,17 @@ let remainScroll = 0;
 let scrollRange = 0;
 let scrollTimeOut = null;
 
+function loginMiddleWare() {
+  if (!store.getState('isLogin')) {
+    $router.redirect('/signin');
+    return false;
+  } else {
+    return true;
+  }
+}
 function setScrollBar() {
   const pageRootElem = document.querySelector('#app > *');
+  if (!pageRootElem) return;
   const { height } = pageRootElem.getBoundingClientRect();
   if (height) scrollHeight = window.innerHeight * (window.innerHeight / height);
   remainScroll = window.innerHeight - scrollHeight;
@@ -74,6 +84,6 @@ $app.addEventListener('scroll', () => {
   scrollHandler();
 });
 async function init() {
-  initRouter({ $app, routes, routeEvent, store });
+  initRouter({ $app, routes, store });
 }
 init();

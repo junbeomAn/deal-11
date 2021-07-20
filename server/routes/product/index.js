@@ -1,8 +1,9 @@
 const express = require('express');
-
+const fs = require('fs');
+const createError = require('http-errors');
 const pool = require('../../db/index.js');
 const router = express.Router();
-const { upload, makeImageUrlString, getProductsWithImageUrlArray } = require('./image.js');
+const { upload, makeImageUrlString, getProductsWithImageUrlArray, parseImageUrlStringToArray } = require('./image.js');
 const { runAsyncWrapper, requiredLoginDecorator } = require('../utils');
 const { selectOrInsertLocation } = require('../location.js');
 const {
@@ -10,9 +11,15 @@ const {
   insertProductQuery,
   deleteLikeQuery,
   insertLikeQuery,
+  selectIsAuthorized,
+  updateProductQuery,
+  deleteProductQuery,
+  selectProductDetailQuery,
   selectProductListQuery,
   selectCategoryItemsQuery,
+  selectMyProductQuery,
 } = require('../query.js');
+const { NotExtended } = require('http-errors');
 
 const FETCH_COUNT = 10;
 
@@ -23,7 +30,6 @@ const FETCH_COUNT = 10;
 router.get('/', runAsyncWrapper(async (req, res) => {
   const { page = 1, location } = req.query;
   const arguments = [String((page-1)*FETCH_COUNT)];
-
   const [products] = await pool.execute(selectProductListQuery(location), arguments);
   const result = getProductsWithImageUrlArray(products);
   res.send({ ok: true, result });
@@ -40,67 +46,122 @@ router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // qu
   res.send({ ok: true, result });
 }));
 
-router.get('/:productId', runAsyncWrapper(async (req, res) => {
-  const { productId } = req.params;
-  const arguments = [productId];
-  
-  const [product] = await pool.execute(selectProductQuery, arguments);
-  const result = getProductsWithImageUrlArray(product)[0];
-  res.send({ ok: true, result });
+
+router.get('/mine', runAsyncWrapper(async (req, res, next) => {
+  const isAuthorized = requiredLoginDecorator(req, next)();
+  if(isAuthorized) {
+    const { user } = req.session;
+    const { page = 1 } = req.query;
+    const arguments = [user.userId, String((page-1)*10)];
+    
+    const [products] = await pool.execute(selectMyProductQuery(), arguments);
+    const result = getProductsWithImageUrlArray(products);
+    res.json({ ok: true, result });
+  }
 }));
 
+router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
+  const { productId } = req.params;
+  const { user } = req.session;
+  const arguments = [productId];
+  
+  const [product] = await pool.execute(selectProductDetailQuery(user? user : {userId: 0}), arguments);
+  if (product.length === 0){
+    next(createError(404, "존재하지 않는 게시물입니다."));
+  } else {
+    const result = getProductsWithImageUrlArray(product)[0];
+    res.send({ ok: true, result });
+  }
+}));
 
-// 여기서 부턴 로그인된 사용자만 사용 가능하다.
-requiredLoginDecorator(router);
+router.put('/:productId', runAsyncWrapper(async (req, res, next) => {
+  const isLogin = requiredLoginDecorator(req, next)();
+  if (isLogin) {
+    const { productId } = req.params;
+    const { userId } = req.session.user;
+    const arguments = [userId, productId];
+    const [check] = await pool.execute(selectIsAuthorized, arguments);
+    if (check[0].authorized) {
+      const images = parseImageUrlStringToArray(check[0].image_url);
+      images.forEach(img => {
+        fs.unlinkSync(appPublic + img);
+      })
+      next();
+    } else {
+      next(createError(401, '수정 권한 없음'));
+    }
+  }
+}));
+router.put('/:productId', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
+  const { productId } = req.params;
+  const { title, content, price, location } = JSON.parse(req.body.data);
+  const image_url = makeImageUrlString(req.files);
+  const location_id = await selectOrInsertLocation(location);
+  const arguments = [title, content, image_url, price, location_id, productId];
+
+  const [result] = await pool.execute(updateProductQuery, arguments);
+  res.send({ ok: true });
+}));
+
+router.delete('/:productId', runAsyncWrapper(async (req, res, next) => {
+  const isLogin = requiredLoginDecorator(req, next)();
+  if (isLogin) {
+    const { productId } = req.params;
+    const { userId } = req.session.user;
+    const arguments = [userId, productId];
+    const [check] = await pool.execute(selectIsAuthorized, arguments);
+    if (check[0].authorized) {
+      const images = parseImageUrlStringToArray(check[0].image_url);
+      images.forEach(img => {
+        fs.unlinkSync(appPublic + img);
+      })
+      await pool.execute(deleteProductQuery, [productId]);
+      res.send({ ok: true });
+    } else {
+      next(createError(401, '삭제 권한 없음'));
+    }
+  }
+}))
+
 
 // upload.array 로 여러개 받을수 있음. product-images는 client input 태그의 name 속성과 일치시킨다.
 // 업로드 된 파일은 req.files에 배열형태로 저장된다.
 // 필요한 json 데이터는 String으로 전달하여 전달받아 server에서 parsing한다.
-router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res) => {
-  // front html form 에서 input field name => product-images
+router.post('/', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
   const { userId } = req.session.user;
-  const { title, content, category_id, price, location } = JSON.parse(req.body.json);
+  const { title, content, category_id, price, location } = JSON.parse(req.body.data);
   const image_url = makeImageUrlString(req.files);
   const location_id = await selectOrInsertLocation(location);
   const arguments = [title, content, userId, category_id, image_url, price, location_id];
 
   const [result] = await pool.execute(insertProductQuery, arguments);
-  res.send({ ok: true, detail_id: result.insertId });
+  res.status(201).json({ ok: true, detail_id: result.insertId });
+
 }));
 
-router.post('/like/:productId', runAsyncWrapper(async (req, res) => {
-  const { userId } = req.session.user;
-  const { productId } = req.params;
-  const arguments = [userId, productId];
+router.post('/like/:productId', runAsyncWrapper(async (req, res, next) => {
+  const isAuthorized = requiredLoginDecorator(req, next)();
+  if (isAuthorized){
+    const { userId } = req.session.user;
+    const { productId } = req.params;
+    const arguments = [userId, productId];
 
-  const [result] = await pool.execute(deleteLikeQuery, arguments);
-  if (result.affectedRows) {
-    res.send({ like: false });
-  } else {
-    await pool.execute(insertLikeQuery, arguments);
-    res.status(201).json({ like: true });
+    const [result] = await pool.execute(deleteLikeQuery, arguments);
+    if (result.affectedRows) {
+      res.send({ like: false });
+    } else {
+      await pool.execute(insertLikeQuery, arguments);
+      res.status(201).json({ like: true });
+    }
   }
 }));
 
-router.get('/mine', runAsyncWrapper(async (req, res) => {
-  const { user } = req.session;
-  const { page = 0 } = req.query;
-  const arguments = [user.userId, String(page)];
-  
-  const locationNameSubQuery = `SELECT name FROM LOCATIONS WHERE PRODUCTS.location_id = LOCATIONS.id`;
-  let selectProductQuery = `SELECT id, title, user_id, created_at, (${locationNameSubQuery}) AS location, image_url, price FROM PRODUCTS WHERE user_id = ?`;
-  selectProductQuery += ` ORDER BY created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
-
-  const [products] = await pool.execute(selectProductQuery, arguments);
-  const result = getProductsWithImageUrlArray(products);
-  res.send({ ok: true, result });
-}));
 
 
-router
-  .route('/:productId')
-  .put((req, res) => {})
-  .delete((req, res) => {});
+// router
+//   .route('/:productId')
+//   .put((req, res) => {})
+//   .delete((req, res) => {});
 
 
 module.exports = router;

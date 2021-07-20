@@ -102,7 +102,7 @@ class Form extends Component {
         if (this.$state.error) {
           this.setState({ error: '' });
         }
-        $router.push('/home');
+        $router.redirect('/home');
       } else {
         this.setState({
           error: res.message || '잘못된 아이디 입니다.',
@@ -147,7 +147,7 @@ class Form extends Component {
             e.preventDefault();
             if (!e.target.closest('.signup-button-wrapper button')) return;
 
-            $router.push('/signup');
+            $router.push('/signup', 1);
           },
         },
       },
