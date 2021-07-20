@@ -5,6 +5,7 @@ import SignUp from './component/auth/SignUp';
 import SignIn from './component/auth/SignIn';
 import Category from './component/category';
 import Menu from './component/menu';
+import ChatDetail from './component/Chat/ChatDetail.js';
 
 import './scss/app.scss';
 import store from './store';
@@ -29,6 +30,7 @@ const routes = [
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
   { path: '/menu', component: Menu },
+  { path: '/chatDetail', component: ChatDetail },
 ];
 const routeEvent = new CustomEvent('route');
 const $app = document.querySelector('#app');
