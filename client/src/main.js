@@ -23,8 +23,8 @@ import store from './store';
  */
 const routes = [
   { path: '/', redirect: '/home' },
-  { path: '/home', component: Home, middleware: test },
-  { path: '/auth', component: Auth },
+  { path: '/home', component: Home },
+  { path: '/auth', component: Auth, middleware: loginMiddleWare },
   { path: '/signin', component: SignIn },
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
@@ -37,7 +37,7 @@ let remainScroll = 0;
 let scrollRange = 0;
 let scrollTimeOut = null;
 
-function test() {
+function loginMiddleWare() {
   if (!store.getState('isLogin')) {
     $router.redirect('/signin');
     return false;

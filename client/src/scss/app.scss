@@ -45,6 +45,39 @@ body {
     overflow-y: scroll;
     > * {
       width: 100%;
+      background-color: white;
+    }
+    &.push {
+      overflow: hidden;
+      > *:nth-child(2) {
+        position: absolute;
+        z-index: 10;
+      }
+      &.left > *:nth-child(2) {
+        top: 0;
+        right: -100%;
+        animation: go-left forwards 0.3s;
+      }
+      &.right > *:nth-child(2) {
+        top: 0;
+        left: -100%;
+        animation: go-right forwards 0.3s;
+      }
+    }
+    &.reverse {
+      overflow: hidden;
+      > *:nth-child(1) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+      }
+      &.right > *:nth-child(1) {
+        animation: go-right forwards 0.3s;
+      }
+      &.left > *:nth-child(1) {
+        animation: go-left forwards 0.3s;
+      }
     }
   }
 }
@@ -66,5 +99,21 @@ body {
   }
   100% {
     opacity: 0;
+  }
+}
+@keyframes go-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+@keyframes go-right {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
   }
 }
