@@ -1,16 +1,13 @@
 import Component from '../../core/Component';
 import NavBar from '../shared/NavBar';
 import MenuTab from './MenuTab';
+import ProductList from './ProductList';
+import ChatList from './ChatList';
 
 import { $router } from '../../lib/router';
 import { BASE_URL, combineWithQueryString } from '../../utils';
 
-import moreIcon from '../../assets/more_vert.svg';
-import chatBubbleIcon from '../../assets/chat_bubble_mini.svg';
-import favoriteMiniIcon from '../../assets/favorite_border_mini.svg';
-import favoriteEmptyIcon from '../../assets/favorite_border.svg';
-import favoriteFullIcon from '../../assets/favorite.svg';
-
+import 'moment/locale/ko';
 import '../../scss/menu.scss';
 
 const products = [
@@ -44,10 +41,12 @@ const products = [
 ];
 
 const api = {
-  getMyProducts: (url) => {
-    return fetch(url).then((res) => res.json());
+  fetch: (url) => {
+    return fetch(url)
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
   },
-  _getMyProducts: (url) => {
+  _fetch: (url) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve({ ok: true, result: products });
@@ -86,23 +85,19 @@ class Menu extends Component {
     };
   }
 
-  getSaleList(e) {
-    const url =
-      `${BASE_URL}/product/mine` +
-      combineWithQueryString({ page: this.store.getState('page') });
-    // 재사용?
-    api._getMyProducts(url).then((res) => {
+  getList(url, active) {
+    let action = '';
+
+    api._fetch(url).then((res) => {
       if (res.ok) {
-        this.store.dispatch('setProducts', res.result);
-        this.setState({ active: e.target.id });
+        if (active === 'salelist' || active === 'likelist') {
+          this.store.dispatch('setProducts', res.result);
+        } else if (active === 'chatlist') {
+          this.store.dispatch('setRooms', res.rooms);
+        }
+        this.setState({ active });
       }
     });
-  }
-
-  getChatList(e) {}
-
-  getLikeList(e) {
-    // this.setState({ active: e.target.id });
   }
 
   handleTabClick(e) {
@@ -110,35 +105,78 @@ class Menu extends Component {
     if (!e.target.closest('.menu-tab-wrapper .tab')) return;
     if (active === e.target.id) return;
 
-    if (e.target.id === 'salelist') {
-      this.getSaleList(e);
-    } else if (e.target.id === 'chatlist') {
-      this.getChatList(e);
-    } else if (e.target.id === 'likelist') {
-      this.getLikeList(e);
+    let url = '';
+    const clicked = e.target.id;
+
+    if (clicked === 'salelist') {
+      url = combineWithQueryString(`${BASE_URL}/product/mine`, {
+        page: this.store.getState('page'),
+      });
+    } else if (clicked === 'chatlist') {
+      url = `${BASE_URL}/chat`;
+    } else if (clicked === 'likelist') {
+      url = `${BASE_URL}/like`;
+    }
+    this.getList(url, clicked);
+  }
+
+  getItem(url, active) {
+    let action = '';
+    let next = '';
+
+    if (active === 'salelist' || active === 'likelist') {
+      action = 'setCurrentProduct';
+      next = `/product/${item.id}`;
+    } else if (active === 'chatlist') {
+      action = 'setCurrentChat';
+      next = `/chat/${item.id}`;
+    }
+    api.fetch(url).then((res) => {
+      if (res.ok) {
+        if (active === 'salelist' || active === 'likelist') {
+          this.store.dispatch(action, res.result);
+          $router.push(next);
+        }
+      }
+    });
+  }
+
+  handleOptionClick(e) {
+    if (!e.target.closest('.list-wrapper .option')) return;
+    // option click
+    const $optionMenu = e.target.closest('.option').previousElementSibling;
+    if ($optionMenu.classList.contains('hidden')) {
+      $optionMenu.classList.remove('hidden');
+    } else {
+      $optionMenu.classList.add('hidden');
     }
   }
 
   handleSaleItemClick(e) {
-    if (!e.target.closest('.list-wrapper .list-item')) return;
+    if (!e.target.closest('.product-list .list-item')) return;
 
-    if (e.target.closest('.list-wrapper .option')) {
-      const $optionMenu = e.target.closest('.option').previousElementSibling;
-      if ($optionMenu.classList.contains('hidden')) {
-        $optionMenu.classList.remove('hidden');
-      } else {
-        $optionMenu.classList.add('hidden');
-      }
-    } else {
-      // data fetch
-      $router.push(`/product/${e.target.id}`);
-    }
+    const item = e.target.closest('.list-wrapper .list-item');
+    const url = `${BASE_URL}/product/${item.id}`;
+    const { active } = this.$state;
+    this.getItem(url, active);
+  }
+
+  handleChatRoomClick(e) {
+    if (!e.target.closest('.chat-list .list-item')) return;
+
+    const item = e.target.closest('.list-wrapper .list-item');
+    const url = `${BASE_URL}/chat/${item.id}`;
+    const { active } = this.$state;
+    this.getItem(url, active);
   }
 
   handleLikeItemClick(e) {
-    if (!e.target.closest('.list-wrapper .list-item')) return;
-    // data fetch
-    // $router.push(`/product/${e.target.id}`);
+    if (!e.target.closest('.product-list .list-item')) return;
+
+    const item = e.target.closest('.list-wrapper .list-item');
+    const url = `${BASE_URL}/product/${item.id}`;
+    const { active } = this.$state;
+    this.getItem(url, active);
   }
 
   mounted() {
@@ -160,6 +198,7 @@ class Menu extends Component {
         },
       },
     ];
+
     if (active === 'salelist') {
       children.push({
         childClass: ProductList,
@@ -173,7 +212,15 @@ class Menu extends Component {
         },
       });
     } else if (active === 'chatlist') {
-      children.push({});
+      children.push({
+        childClass: ChatList,
+        selector: '.list-wrapper',
+        props: {
+          eventTarget: '.menu-wrapper',
+          active,
+          onClick: this.handleChatRoomClick.bind(this),
+        },
+      });
     } else if (active === 'likelist') {
       children.push({
         childClass: ProductList,
@@ -188,97 +235,5 @@ class Menu extends Component {
       });
     }
     this.childReRender(children);
-  }
-}
-
-class ProductList extends Component {
-  setEvent() {
-    const { onClick } = this.$props;
-    this.addEvent('click', '.product-list', onClick);
-  }
-  template() {
-    const { listType = 'with-menu', emptyMessage = '등록한 상품이 없습니다.' } =
-      this.$props;
-    const products = this.store.getState('products');
-    return products.length === 0
-      ? `<span class="empty-message">${emptyMessage}</span>`
-      : `
-      <ul class="product-list">
-      ${products.reduce((acc, product) => {
-        const {
-          title,
-          location,
-          price,
-          created_at,
-          chatCount = 1,
-          likeCount = 1,
-          like,
-        } = product;
-        return (
-          acc +
-          `
-            <li class="list-item">
-              <div class="content-wrapper">
-                <div class="image-box">
-                </div>
-                <div class="info-box">
-                  <div class="title">${title}</div>
-                  <div class="info">
-                    <span>${location}</span>
-                    ∙
-                    <span>${created_at}</span>
-                  </div>
-                  <div class="price">${price}</div>
-                </div>
-                <div class="option-box">
-                  ${
-                    listType === 'with-menu'
-                      ? `<div class="option-menu hidden">
-                      <div class="modify option" role="button">
-                        수정하기
-                      </div>
-                      <div class="delete option" role="button">
-                        삭제하기
-                      </div>
-                    </div>`
-                      : ''
-                  }
-                  <div class="option" role="button">
-                    ${
-                      listType === 'with-menu'
-                        ? `<img class="more-icon" src="${moreIcon}" alt="more" />`
-                        : `<img class="favorite-icon" src="${
-                            like ? favoriteFullIcon : favoriteEmptyIcon
-                          }" alt="favorite" />`
-                    }
-                  </div>
-                  <div class="product-status">
-                  ${
-                    chatCount > 0
-                      ? `<div class="chat-mini-wrapper">
-                        <img class="chat-mini-icon" src="${chatBubbleIcon}" alt="chat-bubble-mini" />
-                        &nbsp;&nbsp;
-                        <span>${chatCount}</span>
-                      </div>`
-                      : ''
-                  }
-                  ${
-                    likeCount > 0
-                      ? `<div class="favorite-mini-wrapper">
-                        <img class="favorite-mini-icon" src="${favoriteMiniIcon}" alt="favorite-border-mini" />
-                        &nbsp;&nbsp;
-                        <span>${likeCount}</span>
-                      </div>`
-                      : ''
-                  }
-                  <div>
-                </div>
-              </div>
-            </li>
-          `
-        );
-      }, '')}
-      </ul>
-    `;
   }
 }
