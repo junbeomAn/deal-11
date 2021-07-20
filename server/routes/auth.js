@@ -45,6 +45,16 @@ router.post('/signup', runAsyncWrapper(async (req, res, next) => {
   const { username, location } = req.body;
   const arguments = [username];
 
+  if (!username || !location || username.length === 0 || location.length === 0) {
+    next(createError(400, "데이터 형식이 올바르지 않습니다"));
+    return;
+  }
+  for (let i=0; i<location.length; i++) {
+    if (location[i].length === 0) {
+      next(createError(400, "데이터 형식이 올바르지 않습니다"));
+      return;
+    }
+  }
   const [result, _] = await pool.execute(existsUserQuery, arguments);
   const isExisted = result[0].result;
 
