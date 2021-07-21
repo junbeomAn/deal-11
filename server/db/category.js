@@ -12,10 +12,12 @@ const categoryData = [
   '스포츠/레저',
   '여성패션/잡화',
   '남성패션/잡화',
-  '유아동',
-  '뷰티/미용',
+  '유아동',
+  '뷰티/미용',
   '반려동물',
   '도서/티켓/음반',
+  '식물',
+  '기타 중고물품',
 ];
 let executeQuery = categoryData.reduce((query, category) => {
   return `${query} (\'${category}\'),`;
