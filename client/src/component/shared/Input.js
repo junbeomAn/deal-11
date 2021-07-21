@@ -4,7 +4,8 @@ import '../../scss/input.scss';
 
 export default class Input extends Component {
   template() {
-    const { size, status, placeholder, type, name, id, border } = this.$props;
+    const { size, status, placeholder, type, name, id, border, errormessage } =
+      this.$props;
     return `
         <input 
             ${id ? `id="${id}"` : ''}
@@ -13,6 +14,11 @@ export default class Input extends Component {
             type="${type || 'text'}"
             name="${name || 'text'}"
          />
+        ${
+          errormessage
+            ? `<p class="input-error-message">${errormessage}</p>`
+            : ''
+        }
       `;
   }
   setEvent() {
