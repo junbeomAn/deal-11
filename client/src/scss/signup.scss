@@ -1,40 +1,29 @@
 @import 'size.scss';
 @import 'theme.scss';
 
-$label-top-position: -30px;
-$form-signup-height: 50%;
-$signup-wrapper-height: 500px;
-
 .signup-wrapper {
-  height: $signup-wrapper-height;
+  min-height: 100vh;
 
   .form-signup {
     position: relative;
-    margin-top: 20px;
-    height: $form-signup-height;
+    margin-top: 3rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
     .error-message-wrapper {
-      @include form-error-style(-2px);
+      @include form-error-style(-1.5rem);
     }
     .username-input-box,
     .location-input-box {
       position: relative;
       label {
-        position: absolute;
-        top: $label-top-position;
-        left: 0;
+        display: block;
+        margin-bottom: 1rem;
         font {
           size: $text-small;
           color: $title-black;
         }
       }
-    }
-    .signup-button-wrapper {
-      position: absolute;
-      bottom: -5px;
     }
   }
 }
