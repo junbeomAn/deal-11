@@ -7,6 +7,7 @@ function isPromise(value) {
 }
 
 const BASE_URL = 'http://localhost:3000/api/v1';
+const AUTH_URL = 'http://localhost:3000';
 
 const combineWithQueryString = (url, qs) => {
   // let ret = url + '/?';

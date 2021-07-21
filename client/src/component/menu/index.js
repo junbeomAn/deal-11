@@ -87,9 +87,8 @@ class Menu extends Component {
   }
 
   getList(url, active) {
-    let action = '';
-
-    api._fetch(url).then((res) => {
+    console.log(url, active);
+    api.fetch(url).then((res) => {
       if (res.ok) {
         if (active === 'salelist' || active === 'likelist') {
           this.store.dispatch('setProducts', res.result);

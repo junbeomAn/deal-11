@@ -4,7 +4,6 @@ import NavBar from '../shared/NavBar';
 import Input from '../shared/Input';
 import { $router } from '../../lib/router';
 import { inputChangeHandler, focusoutHandler } from './utils';
-import { BASE_URL } from '../../utils';
 import promise from '../../lib/api';
 import '../../scss/signup.scss';
 
@@ -43,29 +42,7 @@ export default class SignUpWrapper extends Component {
 }
 
 class SignUp extends Component {
-  setup() {
-    this.$state = {
-      debounce: false,
-    };
-  }
-  template() {
-    return `  
-        <div class="navbar-wrapper"></div>
-        <form class="form-signup"></form>
-        `;
-  }
-  mounted() {
-    const $navbar = this.$target.querySelector('.navbar-wrapper');
-    const $form = this.$target.querySelector('.form-signup');
-    new NavBar(
-      $navbar,
-      {
-        background: 'grey',
-        title: '회원가입',
-      },
-      this.store
-    );
-    new Form($form, {}, this.store);
+  setEvent() {
     this.$target
       .querySelector('.form-signup')
       .addEventListener('submit', (e) => {
@@ -94,8 +71,34 @@ class SignUp extends Component {
               '.signup-button-wrapper > button'
             ).disabled = false;
             console.log(this);
+            $router.push('/signin');
           });
       });
+  }
+  setup() {
+    this.$state = {
+      debounce: false,
+    };
+  }
+  template() {
+    return `  
+        <div class="navbar-wrapper"></div>
+        <form class="form-signup"></form>
+        `;
+  }
+
+  mounted() {
+    const $navbar = this.$target.querySelector('.navbar-wrapper');
+    const $form = this.$target.querySelector('.form-signup');
+    new NavBar(
+      $navbar,
+      {
+        background: 'grey',
+        title: '회원가입',
+      },
+      this.store
+    );
+    new Form($form, {}, this.store);
   }
 }
 
@@ -134,7 +137,7 @@ class Form extends Component {
           placeholder: '영문, 숫자 조합 20자 이하',
           id: 'username',
           eventTarget: '.signup-wrapper',
-          onChange: () => {},
+          onChange: inputChangeHandler(this.store, 'username'),
           onFocusout: focusoutHandler,
         },
       },
@@ -145,7 +148,7 @@ class Form extends Component {
           placeholder: '시, 구 제외, 동만 입력',
           id: 'location',
           eventTarget: '.signup-wrapper',
-          onChange: () => {},
+          onChange: inputChangeHandler(this.store, 'location'),
           onFocusout: focusoutHandler,
         },
       },

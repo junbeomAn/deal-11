@@ -23,7 +23,7 @@ export default class ChatDetailWrapper extends Component {
 
 class ChatDetail extends Component {
   setEvent() {
-    this.addEvent('click', '.chat-detail-wrapper', this.onSubmit);
+    this.addEvent('click', '.chat-detail-wrapper', this.onSubmit.bind(this));
   }
 
   template() {
@@ -40,11 +40,18 @@ class ChatDetail extends Component {
         price: 9999,
       },
     ];
-    const { image_url: imageUrl, status = '판매중', title, price } = product[0];
+    const {
+      image_url: imageUrl,
+      status = '판매중',
+      title,
+      price,
+      id,
+    } = product[0];
+
     return `
       <div class="navbar-wrapper"></div>
       <div class="chat-current-item-wrapper">
-        <div class="chat-current-item">
+        <div class="chat-current-item" data-pid="${id}">
           <div class="image-box small">
             <img src="${imageUrl[0]}" alt="product-image"/>
           </div>
@@ -76,30 +83,66 @@ class ChatDetail extends Component {
     return Number(price).toLocaleString();
   }
 
+  getToId(messages) {
+    const opponent = messages.find((message) => {
+      return message.fromId !== 0;
+    });
+    return opponent.fromId;
+  }
+
   onSubmit(e) {
     if (!e.target.closest('.chat-send-wrapper')) return;
 
     const $input = this.$target.querySelector('.chat-input-wrapper input');
     if (!$input.value) return;
 
-    const { room } = this.store.getState('chatInfo');
-    socket.emit('message', { msg: $input.value, room });
+    const productId =
+      this.$target.querySelector('.chat-current-item').dataset.pid;
+
+    const { room, messages } = this.store.getState('chatInfo');
+    const sendInfo = {
+      productId,
+      toId: this.getToId(messages),
+    };
+    // const room = 1;
+    // const sendInfo = {};
+    socket.emit('message', { msg: $input.value, room, sendInfo });
     $input.value = '';
   }
 
-  initChatListener() {
-    socket.on('message', function (msg) {
-      const list = this.$target.querySelector('.chat-bubble-list');
-      const itemWrapper = document.createElement('li');
-      itemWrapper.classList.add('bubble-item-wrapper');
-      itemWrapper.innerHTML = `
+  getMessageOwner(toId) {
+    const { id } = this.store.getState('user');
+
+    if (toId === id) {
+      return 'oppoent';
+    } else {
+      return 'mine';
+    }
+  }
+
+  getBubbleFormat(msg) {
+    const $itemWrapper = document.createElement('li');
+    $itemWrapper.classList.add('bubble-item-wrapper');
+    $itemWrapper.innerHTML = `
       <div class="bubble-item">
         <div class="content">
-          ${msg}
+        ${msg}
         </div>
       </div>
       `;
-      list.appendChild(itemWrapper);
+    return $itemWrapper;
+  }
+
+  initChatListener() {
+    // socket.emit('joinRoom', { room: 1 });
+    // console.log('room1 joined!!');
+    const $list = this.$target.querySelector('.chat-bubble-list');
+
+    socket.on('message', function ({ msg, toId }) {
+      const $itemWrapper = this.getBubbleFormat(msg);
+      const owner = this.getMessageOwner(toId);
+      $itemWrapper.classList.add(owner);
+      $list.appendChild(itemWrapper);
     });
   }
 
@@ -125,7 +168,7 @@ class ChatDetail extends Component {
         title: chatTarget,
         room,
         right: 'exit',
-        handleRightClick,
+        handleRightClick: this.handleRightClick.bind(this),
       },
       this.store
     );
@@ -140,6 +183,7 @@ class ChatDetail extends Component {
       },
       this.store
     );
-    initChatListener();
+
+    this.initChatListener();
   }
 }

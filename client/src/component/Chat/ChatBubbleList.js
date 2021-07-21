@@ -6,17 +6,17 @@ export default class ChatBubbleList extends Component {
       {
         content: '안녕하세요 ~',
         read: 0,
-        mine: 1,
+        fromId: 0,
       },
       {
         content: '방가워요 ㅎ',
         read: 0,
-        mine: 0,
+        fromId: 0,
       },
       {
         content: '저기요?',
         read: 0,
-        mine: 0,
+        fromId: 3,
       },
     ];
 
@@ -25,11 +25,13 @@ export default class ChatBubbleList extends Component {
     return `
       <ul class="chat-bubble-list">
       ${bubbles.reduce((acc, bubble) => {
-        const { content, mine } = bubble;
+        const { content, fromId } = bubble;
         return (
           acc +
           `
-            <li class="bubble-item-wrapper ${mine ? 'mine' : 'opponent'}">
+            <li class="bubble-item-wrapper ${
+              fromId === 0 ? 'mine' : 'opponent'
+            }">
               <div class="bubble-item">
                 <div class="content">
                   ${content}
