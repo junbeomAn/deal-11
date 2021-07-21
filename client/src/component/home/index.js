@@ -9,6 +9,27 @@ import accountI from '../../assets/account.svg';
 import menuI from '../../assets/menu.svg';
 import locationI from '../../assets/location.svg';
 import '../../scss/home.scss';
+import { BASE_URL } from '../../utils';
+
+const api = {
+  getToken: function () {
+    return localStorage.getItem('token');
+  },
+  fetchWithToken: function (url) {
+    return fetch(url, {
+      headers: {
+        token: this.getToken(),
+      },
+    })
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+  },
+  fetch: function (url) {
+    return fetch(url)
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+  },
+};
 
 export default class HomeWrapper extends Component {
   template() {
@@ -43,6 +64,8 @@ class Home extends Component {
           <button class="menu-btn"><img src=${menuI}></button>
         </div>
       </nav>
+      <div class="nav-occupant"></div>
+      <div class="product-list-wrapper"></div>
       <button class="plus-btn">
         <svg viewBox="0 0 100 100">
           <line x1="50" y1="30" x2="50" y2="70"/>
@@ -93,9 +116,6 @@ class Home extends Component {
     });
     this.addEvent('click', '.category-btn', () => {
       $router.push('/category', 2);
-    });
-    this.addEvent('click', '.menu-btn', () => {
-      $router.push('/menu', 1);
     });
     this.addEvent('click', '.plus-btn', () => {
       const modal = this.$target.querySelector('.modal-wrapper');
@@ -150,6 +170,19 @@ class Home extends Component {
         this.toggleMenuOff();
         return;
       }
+    });
+
+    this.addEvent('click', '.menu-btn', (e) => {
+      if (!e.target.closest('img')) return;
+      if (!this.store.getState('isLogin')) return;
+
+      const url = `${BASE_URL}/product/mine?page=1`;
+      api.fetchWithToken(url).then((res) => {
+        if (res.ok) {
+          this.store.dispatch('setProducts', res.result);
+          $router.push('/menu', 1);
+        }
+      });
     });
   }
   toggleMenuOff() {

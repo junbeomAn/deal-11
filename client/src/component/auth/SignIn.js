@@ -3,10 +3,37 @@ import Button from '../shared/Button';
 import NavBar from '../shared/NavBar';
 import Input from '../shared/Input';
 import { $router } from '../../lib/router';
+<<<<<<< HEAD
 import { BASE_URL } from '../../utils';
 import '../../scss/signin.scss';
 
 import promise from '../../lib/api';
+=======
+import { inputChangeHandler, focusoutHandler } from './utils';
+import '../../scss/signin.scss';
+
+const api = {
+  signIn: (url, data) => {
+    return fetch(url, {
+      method: 'POST',
+      // mode: 'cors',
+      credentials: 'include',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    }).then((res) => res.json());
+  },
+  _signIn: () => {
+    // test usage
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve({ ok: true });
+      }, 800);
+    });
+  },
+};
+>>>>>>> ac126730f1d78d47ccef80ef264cbf17e4765d52
 
 export default class SignInWrapper extends Component {
   template() {
@@ -81,6 +108,49 @@ class Form extends Component {
       error: '',
     };
   }
+<<<<<<< HEAD
+=======
+
+  saveToken(token) {
+    localStorage.setItem('token', token);
+  }
+
+  handleSignInClick(e) {
+    e.preventDefault();
+    if (!e.target.closest('.signin-button-wrapper button')) return;
+
+    const username = this.store.getState('username');
+    const url = `${API_ENDPOINT}/auth/signin`;
+
+    if (!username) {
+      this.setState({ error: '아이디를 입력해주세요' });
+      return;
+    }
+
+    api.signIn(url, { username }).then((res) => {
+      console.log(res);
+      if (res.ok === true) {
+        const { result } = res;
+        this.store.dispatch('inputValue', {
+          inputName: 'username',
+          value: '',
+        });
+        this.saveToken(result.token);
+        this.store.dispatch('setIsLogin', true);
+        this.store.dispatch('setUserInfo', result);
+        // store 로그인 상태 및 로딩 상태 변경 필요
+        if (this.$state.error) {
+          this.setState({ error: '' });
+        }
+        $router.redirect('/home');
+      } else {
+        this.setState({
+          error: res.message || '잘못된 아이디 입니다.',
+        });
+      }
+    });
+  }
+>>>>>>> ac126730f1d78d47ccef80ef264cbf17e4765d52
 
   mounted() {
     this.childReRender([

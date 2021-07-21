@@ -1,13 +1,9 @@
-@import 'theme';
+@import 'theme.scss';
 
-.home-wrapper {
-  height: 1800px;
-}
-.home-nav {
-  background-color: $baemin;
+@mixin nav-style() {
+  background-color: $baemin-primary;
   padding: 1rem;
   color: white;
-  position: fixed;
   width: 100%;
   z-index: 1;
   display: flex;
@@ -15,6 +11,18 @@
   align-items: center;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+}
+$nav-height: 65px;
+.home-wrapper {
+  height: 1800px;
+  .nav-occupant {
+    @include nav-style();
+    height: $nav-height;
+  }
+}
+.home-nav {
+  @include nav-style();
+  position: fixed;
 
   button:not(.menu-item) {
     background-color: inherit;
@@ -159,6 +167,7 @@
     }
   }
 }
+
 @keyframes location {
   0% {
     transform: translateY(0);

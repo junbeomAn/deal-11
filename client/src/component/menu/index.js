@@ -11,39 +11,16 @@ import socket from '../Chat/socket';
 import 'moment/locale/ko';
 import '../../scss/menu.scss';
 
-const products = [
-  {
-    title: '다용도 캐비닛',
-    location: '역삼동',
-    created_at: '1일전',
-    price: '369,000원',
-    chatCount: 1,
-    likeCount: 1,
-    like: false,
-  },
-  {
-    title: '다용도 캐비닛',
-    location: '역삼동',
-    created_at: '1일전',
-    price: '369,000원',
-    chatCount: 1,
-    likeCount: 1,
-    like: true,
-  },
-  {
-    title: '다용도 캐비닛',
-    location: '역삼동',
-    created_at: '1일전',
-    price: '369,000원',
-    chatCount: 1,
-    likeCount: 1,
-    like: false,
-  },
-];
-
 const api = {
-  fetch: (url) => {
-    return fetch(url)
+  getToken: function () {
+    return localStorage.getItem('token');
+  },
+  fetchWithToken: function (url) {
+    return fetch(url, {
+      headers: {
+        token: this.getToken(),
+      },
+    })
       .then((res) => res.json())
       .catch((err) => console.error(err));
   },
@@ -87,9 +64,7 @@ class Menu extends Component {
   }
 
   getList(url, active) {
-    let action = '';
-
-    api._fetch(url).then((res) => {
+    api.fetchWithToken(url).then((res) => {
       if (res.ok) {
         if (active === 'salelist' || active === 'likelist') {
           this.store.dispatch('setProducts', res.result);
@@ -118,6 +93,7 @@ class Menu extends Component {
     } else if (clicked === 'likelist') {
       url = `${BASE_URL}/like`;
     }
+
     this.getList(url, clicked);
   }
 
@@ -134,7 +110,7 @@ class Menu extends Component {
       // next = `/chat/${item.id}`;
       next = `/chatDetail`;
     }
-    api.fetch(url).then((res) => {
+    api.fetchWithToken(url).then((res) => {
       if (res.ok) {
         if (active === 'salelist' || active === 'likelist') {
           this.store.dispatch(action, res.result);
@@ -150,7 +126,7 @@ class Menu extends Component {
 
   handleOptionClick(e) {
     if (!e.target.closest('.list-wrapper .option')) return;
-    // option click
+
     const $optionMenu = e.target.closest('.option').previousElementSibling;
     if ($optionMenu.classList.contains('hidden')) {
       $optionMenu.classList.remove('hidden');
@@ -160,6 +136,7 @@ class Menu extends Component {
   }
 
   handleSaleItemClick(e) {
+    if (e.target.closest('.list-wrapper .option')) return;
     if (!e.target.closest('.product-list .list-item')) return;
 
     const item = e.target.closest('.list-wrapper .list-item');
@@ -228,6 +205,7 @@ class Menu extends Component {
           listType: 'with-menu',
           emptyMesage: '등록한 상품이 없습니다.',
           onClick: this.handleSaleItemClick.bind(this),
+          onOptionClick: this.handleOptionClick.bind(this),
         },
       });
     } else if (active === 'chatlist') {

@@ -24,7 +24,12 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static('public'));
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: 'http://127.0.0.1:5500',
+  })
+);
 
 app.use('/auth', authRouter);
 app.use('/api/v1', indexRouter);

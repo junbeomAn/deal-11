@@ -33,8 +33,8 @@ const routes = [
   { path: '/signin', component: SignIn },
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
-  { path: '/menu', component: Menu },
-  { path: '/chatDetail', component: ChatDetail },
+  { path: '/menu', component: Menu, middleware: loginMiddleWare },
+  { path: '/chatDetail', component: ChatDetail, middleware: loginMiddleWare },
   { path: '/post', component: Post },
 ];
 const $app = document.querySelector('#app');

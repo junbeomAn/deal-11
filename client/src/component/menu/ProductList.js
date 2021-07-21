@@ -1,5 +1,6 @@
-import Component from '../../core/Component';
+import moment from 'moment';
 
+import Component from '../../core/Component';
 import moreIcon from '../../assets/more_vert.svg';
 import chatBubbleIcon from '../../assets/chat_bubble_mini.svg';
 import favoriteMiniIcon from '../../assets/favorite_border_mini.svg';
@@ -10,8 +11,9 @@ import '../../scss/productlist.scss';
 
 export default class ProductList extends Component {
   setEvent() {
-    const { onClick } = this.$props;
+    const { onClick, onOptionClick = () => {} } = this.$props;
     this.addEvent('click', '.product-list', onClick);
+    this.addEvent('click', '.option', onOptionClick);
   }
   template() {
     const { listType = 'with-menu', emptyMessage = '등록한 상품이 없습니다.' } =
@@ -22,6 +24,7 @@ export default class ProductList extends Component {
       : `
       <ul class="product-list product-list-page-1">
       ${products.reduce((acc, product) => {
+        console.log(product);
         const {
           id,
           title,
@@ -31,6 +34,7 @@ export default class ProductList extends Component {
           chat_count = 1,
           like_count = 1,
           like,
+          image_url: imageUrl,
         } = product;
         return (
           acc +
@@ -38,13 +42,14 @@ export default class ProductList extends Component {
             <li class="list-item" id="${id}">
               <div class="content-wrapper">
                 <div class="image-box">
+                  <img src="${imageUrl[0]}" alt="product-image" />
                 </div>
                 <div class="info-box">
                   <div class="title">${title}</div>
                   <div class="info">
                     <span>${location}</span>
                     ∙
-                    <span>${created_at}</span>
+                    <span>${moment(created_at).fromNow()}</span>
                   </div>
                   <div class="price">${price}</div>
                 </div>
