@@ -52,7 +52,9 @@ class Home extends Component {
     `;
   }
   mounted() {
-    const text = this.$state.login ? '동네' : '로그인 해주세요';
+    const text = this.$state.login
+      ? this.store.getState('user').location[this.store.getState('selected')]
+      : '로그인 해주세요';
     this.childReRender([
       {
         childClass: Location,
@@ -68,7 +70,6 @@ class Home extends Component {
     this.store.dispatch('modalChange', false);
     this.$state = {
       login: this.store.getState('isLogin'),
-      location: this.store.getState('location')[0],
     };
   }
   setEvent() {
@@ -118,7 +119,7 @@ class Home extends Component {
             childClass: ToggleMenu,
             selector: '.toggle-menu-wrapper',
             props: {
-              location: this.$state.location,
+              location: this.store.getState('user').location,
             },
           },
         ]);
@@ -146,22 +147,6 @@ class Home extends Component {
         }, 300);
       }
     });
-  }
-  shouldComponentUpdate(prevState, nextState) {
-    if (prevState.login !== nextState.login) {
-      const text = nextState.login ? nextState.location : '로그인 해주세요';
-      this.childReRender([
-        {
-          childClass: Location,
-          selector: '.location-btn',
-          props: {
-            login: nextState.login,
-            text,
-          },
-        },
-      ]);
-    }
-    return false;
   }
 }
 

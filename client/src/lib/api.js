@@ -1,7 +1,8 @@
 export default (url, method, headers = {}, body = {}) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open(method, url);
+    xhr.open(method, url, true);
+    xhr.withCredentials = true;
     for (let [key, value] of Object.entries(headers)) {
       xhr.setRequestHeader(key, value);
     }

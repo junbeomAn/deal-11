@@ -1,0 +1,13 @@
+@import 'theme';
+
+.product-preview-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  > img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+}

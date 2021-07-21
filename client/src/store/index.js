@@ -2,7 +2,7 @@ class Store {
   states = {
     isLogin: false,
     homeModal: false,
-    location: ['동네', '옆 동네'],
+    selected: 0,
     inputValue: '',
     isLoading: false,
     page: 1,
