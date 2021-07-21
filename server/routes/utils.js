@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const app = require('../app');
+const jwt = require('jsonwebtoken');
 
 const injectAuthStateToSession = (req, { id, location, username }) => {
   req.session.user = {
@@ -29,10 +29,22 @@ function runAsyncWrapper(callback) {
 }
 
 function requiredLoginDecorator(req, next) {
-  return function () {
-    if (!req.session.user) next(createError(401, '로그인을 해주세요.'));
-    else return true;
-  };
+  return new Promise((resolve, reject) => {
+    const { token } = req.headers;
+    const SECRET_KEY = process.env.COOKIE_SECRET;
+
+    if (!token) {
+      reject(new Error(401));
+    }
+
+    jwt.verify(token, SECRET_KEY, {}, (err, decode) => {
+      if (!decode) {
+        reject(new Error(401));
+      } else {
+        resolve(decode);
+      }
+    });
+  });
 }
 
 module.exports = {
