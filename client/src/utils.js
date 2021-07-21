@@ -14,6 +14,6 @@ const combineWithQueryString = (url, qs) => {
   // Object.keys(qs).forEach((key) => {
   //   ret += key + '=' + qs[key];
   // });
-  return url + '/?' + new URLSearchParams(qs);
+  return url + '?' + new URLSearchParams(qs);
 };
 export { isClass, isPromise, BASE_URL, combineWithQueryString };
