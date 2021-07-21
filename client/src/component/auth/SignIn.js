@@ -4,7 +4,6 @@ import NavBar from '../shared/NavBar';
 import Input from '../shared/Input';
 import { $router } from '../../lib/router';
 import { inputChangeHandler, focusoutHandler } from './utils';
-import { API_URL } from '../../utils';
 import '../../scss/signin.scss';
 
 const api = {
@@ -77,6 +76,11 @@ class Form extends Component {
       error: '',
     };
   }
+
+  saveToken(token) {
+    localStorage.setItem('token', token);
+  }
+
   handleSignInClick(e) {
     e.preventDefault();
     if (!e.target.closest('.signin-button-wrapper button')) return;
@@ -90,12 +94,14 @@ class Form extends Component {
     }
 
     api.signIn(url, { username }).then((res) => {
+      console.log(res);
       if (res.ok === true) {
         const { result } = res;
         this.store.dispatch('inputValue', {
           inputName: 'username',
           value: '',
         });
+        this.saveToken(result.token);
         this.store.dispatch('setIsLogin', true);
         this.store.dispatch('setUserInfo', result);
         // store 로그인 상태 및 로딩 상태 변경 필요

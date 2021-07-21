@@ -8,7 +8,7 @@ const inputThrottle = (callback) => {
     callback();
     // console.log('throttle?');
     timeout = null;
-  }, 600);
+  }, 300);
 };
 
 const focusoutHandler = (e) => {
