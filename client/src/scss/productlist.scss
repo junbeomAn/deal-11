@@ -1,0 +1,120 @@
+@import 'size.scss';
+@import 'theme.scss';
+
+$list-item-padding: 20px;
+
+$product-image-size: 106px;
+$product-status-icon-size: 14px;
+
+$infobox-margin: 10px;
+
+$option-menu-width: 165px;
+$option-menu-height: 96px;
+$option-padding: 16px;
+$option-menu-top: 29px;
+
+.empty-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.product-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .list-item {
+    width: 100%;
+    padding: $list-item-padding;
+    border-bottom: $border-weight solid $line-grey;
+    cursor: pointer;
+    .content-wrapper {
+      display: flex;
+      .image-box {
+        max-width: $product-image-size;
+        height: $product-image-size;
+        border: $border-weight-thin solid $line-grey;
+        border-radius: $button-radius;
+        flex: 1;
+      }
+      .info-box {
+        padding: 5px 20px;
+        flex: 1;
+        .title {
+          font-size: $text-medium;
+          margin-bottom: $infobox-margin;
+        }
+        .info {
+          margin-bottom: $infobox-margin;
+          span {
+            color: $content-grey;
+            font-size: $text-small;
+          }
+        }
+        .price {
+          font-size: $text-small;
+        }
+      }
+      .option-box {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        height: $product-image-size;
+        right: $list-item-padding;
+        flex: 1;
+
+        .option-menu {
+          position: absolute;
+          background-color: $off-white;
+          width: $option-menu-width;
+          height: $option-menu-height;
+          border-radius: $button-radius;
+          border: 1px solid $line-grey;
+          top: $option-menu-top;
+          .option {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            font-size: $text-small;
+            height: 50%;
+            padding: $option-padding;
+            cursor: pointer;
+            border-radius: inherit;
+            &:first-child {
+              border-bottom: 1px solid $line-grey;
+            }
+            &.delete {
+              color: $baemin-error;
+            }
+          }
+          &.hidden {
+            display: none;
+          }
+        }
+
+        .more-icon,
+        .favorite-icon {
+          width: 20px;
+          height: 20px;
+        }
+        .product-status {
+          display: flex;
+          div + div {
+            margin-left: 10px;
+          }
+          .chat-mini-wrapper,
+          .favorite-mini-wrapper {
+            display: flex;
+            align-items: center;
+            img {
+              width: $product-status-icon-size;
+              height: $product-status-icon-size;
+            }
+          }
+        }
+      }
+    }
+  }
+}

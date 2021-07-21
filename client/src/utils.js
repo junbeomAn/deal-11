@@ -6,9 +6,13 @@ function isPromise(value) {
   return value instanceof Promise;
 }
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = 'http://localhost:3000/api/v1';
 
 const combineWithQueryString = (url, qs) => {
-  return url + new URLSearchParams(qs);
+  // let ret = url + '/?';
+  // Object.keys(qs).forEach((key) => {
+  //   ret += key + '=' + qs[key];
+  // });
+  return url + '/?' + new URLSearchParams(qs);
 };
 export { isClass, isPromise, BASE_URL, combineWithQueryString };

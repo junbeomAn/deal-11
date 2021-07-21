@@ -104,7 +104,6 @@ class CategoryContents extends Component {
     api._getProductByCategory(url).then((res) => {
       if (res.ok) {
         this.store.dispatch('setProducts', res.result);
-        // console.log(this.store.getState('products'));
         $router.push('/home');
       }
     });

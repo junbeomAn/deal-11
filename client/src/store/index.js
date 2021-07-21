@@ -39,6 +39,15 @@ class Store {
     setProducts: (products) => {
       this.setState('products', products);
     },
+    setRooms: (rooms) => {
+      this.setState('rooms', rooms);
+    },
+    setCurrentProduct: (product) => {
+      this.setState('currentProduct', product);
+    },
+    setCurrentChatInfo: (chatInfo) => {
+      this.setState('chatInfo', chatInfo);
+    },
   };
   dispatch(funcName, args = {}) {
     return this.actions[funcName](args);

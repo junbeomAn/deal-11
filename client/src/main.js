@@ -5,6 +5,7 @@ import SignUp from './component/auth/SignUp';
 import SignIn from './component/auth/SignIn';
 import Category from './component/category';
 import Menu from './component/menu';
+import ChatDetail from './component/Chat/ChatDetail.js';
 import Animation from './component/animation';
 import Post from './component/post';
 
@@ -32,6 +33,7 @@ const routes = [
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
   { path: '/menu', component: Menu },
+  { path: '/chatDetail', component: ChatDetail },
   { path: '/post', component: Post },
 ];
 const $app = document.querySelector('#app');

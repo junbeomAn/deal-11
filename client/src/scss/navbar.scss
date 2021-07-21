@@ -9,6 +9,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   .nav-bar-btn {
     justify-self: flex-start;
     margin: 1.5rem;
@@ -32,9 +33,10 @@
   }
   &.grey,
   &.gray {
-    background: {
-      color: $off-white;
-    }
+    background-color: $off-white;
+  }
+  &.white {
+    background-color: #fff;
   }
   &.transparent {
     background-color: transparent;
