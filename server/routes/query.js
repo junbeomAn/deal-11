@@ -39,7 +39,7 @@ const selectChatRoomAllQuery = (userId) => {
 };
 const selectProductForChatQuery = (roomId) => {
   return `
-    SELECT product.image_url, product.title, product.price 
+    SELECT product.id, product.image_url, product.title, product.price 
     FROM PRODUCTS AS product, CHAT_ROOMS AS room 
     WHERE room.id = ${roomId} AND room.product_id = product.id
   `;
@@ -47,7 +47,7 @@ const selectProductForChatQuery = (roomId) => {
 const selectChatRoomDetailQuery = (userId, roomId) => {
   return `
     SELECT content, MESSAGES.read,
-    IF(sender_id = ${userId}, 1, 0) AS mine
+    IF(sender_id = ${userId}, 0, sender_id) AS fromId 
     FROM MESSAGES 
     WHERE chat_id = ${roomId}
   `;
