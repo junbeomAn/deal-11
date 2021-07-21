@@ -11,6 +11,7 @@ import Post from './component/post';
 
 import './scss/app.scss';
 import store from './store';
+import promise from './lib/api';
 
 /**
  * route
@@ -85,7 +86,19 @@ $app.addEventListener('route', () => {
 $app.addEventListener('scroll', () => {
   scrollHandler();
 });
-async function init() {
-  initRouter({ $app, routes, store });
+function init() {
+  promise(API_ENDPOINT + '/myinfo', 'GET')
+    .then((res) => {
+      const isLogin = res.login;
+      store.dispatch('setIsLogin', isLogin);
+      if (isLogin) {
+        const user = res.user;
+        store.setState('user', user);
+      }
+      initRouter({ $app, routes, store });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 init();
