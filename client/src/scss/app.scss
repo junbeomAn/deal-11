@@ -63,6 +63,16 @@ body {
         left: -100%;
         animation: go-right forwards 0.3s;
       }
+      &.up > *:nth-child(2) {
+        bottom: -100%;
+        left: 0;
+        animation: go-up forwards 0.3s;
+      }
+      &.down > *:nth-child(2) {
+        top: -100%;
+        left: 0;
+        animation: go-down forwards 0.3s;
+      }
     }
     &.reverse {
       overflow: hidden;
@@ -77,6 +87,12 @@ body {
       }
       &.left > *:nth-child(1) {
         animation: go-left forwards 0.3s;
+      }
+      &.up > *:nth-child(1) {
+        animation: go-up forwards 0.3s;
+      }
+      &.down > *:nth-child(1) {
+        animation: go-down forwards 0.3s;
       }
     }
   }
@@ -115,5 +131,21 @@ body {
   }
   to {
     transform: translate3d(100%, 0, 0);
+  }
+}
+@keyframes go-up {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -100%, 0);
+  }
+}
+@keyframes go-down {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 100%, 0);
   }
 }

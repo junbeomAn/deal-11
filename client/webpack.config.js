@@ -40,7 +40,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      API_ENDPOINT: JSON.stringify('localhost:3000'),
+      API_ENDPOINT: JSON.stringify('http://localhost:3000'),
     }),
     new HtmlWebpackPlugin({
       template: './src/index.html',

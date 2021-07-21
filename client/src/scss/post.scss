@@ -1,0 +1,119 @@
+@import './theme.scss';
+
+.post-wrapper {
+  min-height: 100vh;
+  .form-wrapper {
+    margin-bottom: 50px;
+  }
+  .post-form {
+    display: flex;
+    flex-direction: column;
+    margin: 0 1.5rem;
+    font-size: 1.5rem;
+    input[type='file'] {
+      display: none;
+    }
+    > label:not(.custom-file-upload) {
+      padding: 1.5rem 0;
+      border-top: 1px solid $placeholder-grey;
+      display: flex;
+      align-items: center;
+      > input,
+      textarea {
+        width: 100%;
+        resize: none;
+        font-size: 1rem;
+        padding: 0.5em 0;
+        &:focus {
+          outline: none;
+        }
+        &::placeholder {
+          color: $content-grey;
+          font-size: 1rem;
+        }
+      }
+      > textarea {
+        height: 20rem;
+      }
+    }
+    > .file-upload-wrapper {
+      padding: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      width: 100%;
+      overflow-x: auto;
+      > .custom-file-upload {
+        border: 1px solid $placeholder-grey;
+        color: $content-grey;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-right: 0.5rem;
+        &:hover {
+          cursor: pointer;
+        }
+        > .file-count {
+          font-size: 0.8rem;
+        }
+      }
+      > .image-preview-list {
+        display: flex;
+        align-items: center;
+        > div {
+          position: relative;
+          display: flex;
+          align-items: center;
+          margin-right: 0.5rem;
+          > img {
+            object-fit: contain;
+          }
+          > .remove {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 3;
+            transform: translate3d(50%, -50%, 0);
+            border-radius: 50%;
+            background-color: $danger;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            &:hover {
+              cursor: pointer;
+            }
+            > line {
+              stroke-width: 15;
+              stroke-linecap: round;
+            }
+          }
+        }
+      }
+      > .custom-file-upload,
+      img {
+        width: 80px;
+        height: 80px;
+        background-color: #eee;
+        border-radius: 5px;
+      }
+    }
+    input,
+    textarea {
+      border: none;
+    }
+  }
+  .location-wrapper {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    font-size: 1.1rem;
+    padding: 0.8rem 1.5rem;
+    border-top: 1px solid $placeholder-grey;
+    > * {
+      margin-right: 0.5em;
+    }
+  }
+}

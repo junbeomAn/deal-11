@@ -107,6 +107,12 @@ export let $router;
 export function initRouter(options) {
   const router = new Router(options);
   $router = {
+    /**
+     *
+     * @param {string} path : route path
+     * @param {number} moveTo : 0: none, 1: 오른쪽에서 왼쪽으로, 2: 왼쪽에서 오른쪽으로, 3: 아래에서 위로, 4: 위에서 아래로
+     * @returns
+     */
     push: (path, moveTo = 0) => router.push(path, moveTo),
     redirect: (path) => router.redirect(path),
   };
