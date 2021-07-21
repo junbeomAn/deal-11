@@ -37,9 +37,13 @@ class SignIn extends Component {
       .querySelector('.form-signin')
       .addEventListener('submit', (e) => {
         e.preventDefault();
+        const errorElem = e.target.querySelector('.error-message-wrapper');
+        errorElem.classList.add('hidden');
         if (username.value.length === 0) {
           username.parentNode.classList.add('error');
           return;
+        } else {
+          username.parentNode.classList.remove('error');
         }
         const header = {
           'Content-Type': 'application/json',
@@ -59,7 +63,10 @@ class SignIn extends Component {
             $router.redirect('/home');
           })
           .catch((err) => {
-            console.log(err);
+            if (err.message === '401') {
+              errorElem.innerText = '존재하지 않은 아이디 입니다.';
+              errorElem.classList.remove('hidden');
+            }
           });
       });
   }
@@ -67,10 +74,9 @@ class SignIn extends Component {
 
 class Form extends Component {
   template() {
-    const { error } = this.$state;
     return `
-      <div class="error-message-wrapper ${error ? '' : 'hidden'}">
-        ${error}
+      <div class="error-message-wrapper hidden">
+        
       </div> 
       <div class="input-wrapper">
       </div>
@@ -79,11 +85,6 @@ class Form extends Component {
       <div class="signup-button-wrapper button-wrapper">
       </div>
     `;
-  }
-  setup() {
-    this.$state = {
-      error: '',
-    };
   }
 
   mounted() {

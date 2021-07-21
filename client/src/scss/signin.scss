@@ -13,6 +13,6 @@
   flex-direction: column;
   align-items: center;
   .error-message-wrapper {
-    @include input-error-style(-7px);
+    @include form-error-style(-1.5rem);
   }
 }

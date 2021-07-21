@@ -23,14 +23,36 @@ $baemin-error: #f45452;
   backdrop-filter: blur(4px);
   border-radius: 10px;
 }
-@mixin input-error-style($top) {
+@mixin form-error-style($top) {
   width: $large-width;
   position: absolute;
   top: $top;
   font-size: 12px;
-  color: $baemin-error;
+  color: $danger;
   text-align: center;
+  animation: form-error-animation 0.3s;
   &.hidden {
     display: none;
+  }
+}
+
+@keyframes form-error-animation {
+  0% {
+    transform: translate3d(2%, 0, 0);
+  }
+  20% {
+    transform: translate3d(-2%, 0, 0);
+  }
+  40% {
+    transform: translate3d(2%, 0, 0);
+  }
+  60% {
+    transform: translate3d(-2%, 0, 0);
+  }
+  80% {
+    transform: translate3d(2%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-2%, 0, 0);
   }
 }

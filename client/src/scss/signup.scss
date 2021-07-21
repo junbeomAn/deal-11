@@ -17,7 +17,7 @@ $signup-wrapper-height: 500px;
     align-items: center;
     justify-content: space-evenly;
     .error-message-wrapper {
-      @include input-error-style(-2px);
+      @include form-error-style(-2px);
     }
     .username-input-box,
     .location-input-box {
