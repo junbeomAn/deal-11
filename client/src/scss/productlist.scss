@@ -36,6 +36,10 @@ $option-menu-top: 29px;
         border: $border-weight-thin solid $line-grey;
         border-radius: $button-radius;
         flex: 1;
+        img {
+          width: 100%;
+          height: 100%;
+        }
       }
       .info-box {
         padding: 5px 20px;

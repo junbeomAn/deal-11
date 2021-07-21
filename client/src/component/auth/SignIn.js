@@ -4,7 +4,6 @@ import NavBar from '../shared/NavBar';
 import Input from '../shared/Input';
 import { $router } from '../../lib/router';
 import { inputChangeHandler, focusoutHandler } from './utils';
-import { BASE_URL } from '../../utils';
 import '../../scss/signin.scss';
 
 const api = {
@@ -12,6 +11,7 @@ const api = {
     return fetch(url, {
       method: 'POST',
       // mode: 'cors',
+      credentials: 'include',
       headers: {
         'content-type': 'application/json',
       },
@@ -76,26 +76,32 @@ class Form extends Component {
       error: '',
     };
   }
+
+  saveToken(token) {
+    localStorage.setItem('token', token);
+  }
+
   handleSignInClick(e) {
     e.preventDefault();
     if (!e.target.closest('.signin-button-wrapper button')) return;
 
     const username = this.store.getState('username');
-    const url = `${BASE_URL}/auth/signin`;
+    const url = `${API_ENDPOINT}/auth/signin`;
 
     if (!username) {
       this.setState({ error: '아이디를 입력해주세요' });
       return;
     }
 
-    api._signIn(url, { username }).then((res) => {
+    api.signIn(url, { username }).then((res) => {
+      console.log(res);
       if (res.ok === true) {
-        // user 정보 저장?!, res.result
         const { result } = res;
         this.store.dispatch('inputValue', {
           inputName: 'username',
           value: '',
         });
+        this.saveToken(result.token);
         this.store.dispatch('setIsLogin', true);
         this.store.dispatch('setUserInfo', result);
         // store 로그인 상태 및 로딩 상태 변경 필요

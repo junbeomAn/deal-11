@@ -74,23 +74,32 @@ class Content extends Component {
       <div/>
     `;
   }
+
+  removeToken() {
+    localStorage.removeItem('token');
+  }
+
   handleLogout(e) {
     if (!e.target.closest('.button-wrapper button')) return;
     const url = `${BASE_URL}/auth/signout`;
 
-    api._signOut(url).then((res) => {
-      if (res.ok) {
-        this.store.dispatch('setIsLogin', false);
-        $router.push('/signin');
-      }
-    });
+    this.removeToken();
+    this.store.dispatch('setIsLogin', false);
+    $router.push('/signin');
+    // api._signOut(url).then((res) => {
+    //   if (res.ok) {
+    //     this.store.dispatch('setIsLogin', false);
+    //     $router.push('/signin');
+    //   }
+    // });
   }
   mounted() {
+    const { username } = this.store.getState('user');
     this.childReRender([
       {
         childClass: Username,
         selector: '.username',
-        props: { username: this.store.getState('username') || '안준범' },
+        props: { username },
       },
       {
         childClass: Button,
