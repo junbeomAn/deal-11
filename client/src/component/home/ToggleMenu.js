@@ -1,10 +1,12 @@
 import Component from '../../core/Component';
 import promise from '../../lib/api';
 
+import '../../scss/togglemenu.scss';
+
 export default class ToggleMenuWrapper extends Component {
   template() {
     return `
-      <div class="toggle-menu">
+      <div class="toggle-menu off">
       </div>
     `;
   }
@@ -18,11 +20,16 @@ export default class ToggleMenuWrapper extends Component {
 }
 class ToggleMenu extends Component {
   template() {
+    const buttonHTML = this.$props.location.reduce((prev, location, idx) => {
+      return (
+        prev +
+        `<button class="reload-btn menu-item" data-selected="${idx}">${location}</button>`
+      );
+    }, '');
+
     return `
-      ${this.$props.location.map((location, idx) => {
-        return `<button class="reload-btn" data-selected="${idx}">${location}</button>`;
-      })}
-      <button class="add-location-btn">내 동네 설정하기</button>
+      ${buttonHTML}
+      <button class="add-location-btn menu-item">내 동네 설정하기</button>
     `;
   }
   setEvent() {

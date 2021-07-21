@@ -16,7 +16,7 @@
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 
-  button {
+  button:not(.menu-item) {
     background-color: inherit;
     border: none;
     padding: 0;
@@ -62,34 +62,6 @@
     h2 {
       font-size: 1.3rem;
       font-weight: bold;
-    }
-    > .toggle-menu-wrapper {
-      width: 100%;
-      position: absolute;
-      top: 90%;
-      left: 0;
-      > .toggle-menu {
-        background-color: #fafafa;
-        border-radius: 10px;
-        overflow: hidden;
-        animation: toggle-down 0.3s forwards;
-
-        &.off {
-          animation: toggle-off 0.3s forwards;
-        }
-      }
-      button {
-        text-align: left;
-        font-size: 1.1rem;
-        padding: 1em;
-        width: 100%;
-        color: black;
-        display: block;
-
-        &:nth-child(1) {
-          border-bottom: 1px solid #bbb;
-        }
-      }
     }
   }
 }
@@ -213,21 +185,5 @@
   to {
     height: 0px;
     transform: translate3d(0, 100%, 0);
-  }
-}
-@keyframes toggle-down {
-  from {
-    height: 0px;
-  }
-  to {
-    height: 114px;
-  }
-}
-@keyframes toggle-off {
-  from {
-    height: 114px;
-  }
-  to {
-    height: 0px;
   }
 }

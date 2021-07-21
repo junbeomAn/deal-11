@@ -65,6 +65,17 @@ class Home extends Component {
         },
       },
     ]);
+    if (this.$state.login) {
+      this.childReRender([
+        {
+          childClass: ToggleMenu,
+          selector: '.toggle-menu-wrapper',
+          props: {
+            location: this.store.getState('user').location,
+          },
+        },
+      ]);
+    }
   }
   setup() {
     this.store.dispatch('modalChange', false);
@@ -108,45 +119,41 @@ class Home extends Component {
       }
     });
 
-    this.addEvent('click', '.location-btn', () => {
-      const toggleMenuWrapper = this.$target.querySelector(
-        '.toggle-menu-wrapper'
-      );
-      const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
-      if (this.$state.login && !toggleMenu) {
-        this.childReRender([
-          {
-            childClass: ToggleMenu,
-            selector: '.toggle-menu-wrapper',
-            props: {
-              location: this.store.getState('user').location,
-            },
-          },
-        ]);
-      } else if (this.$state.login && toggleMenu) {
-        toggleMenu.classList.add('off');
-        setTimeout(() => {
-          while (toggleMenuWrapper.hasChildNodes()) {
-            toggleMenuWrapper.removeChild(toggleMenuWrapper.lastChild);
-          }
-        }, 300);
-      }
-    });
-
+    this.addEvent(
+      'click',
+      '.location-btn',
+      (e) => {
+        const toggleMenuWrapper = this.$target.querySelector(
+          '.toggle-menu-wrapper'
+        );
+        const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
+        if (this.$state.login && toggleMenu.classList.contains('off')) {
+          e.stopPropagation();
+          toggleMenu.classList.remove('off');
+          const toggleMenuButtons = [...toggleMenu.children];
+          const menuHeight = toggleMenuButtons.reduce((sum, child) => {
+            const { height } = child.getBoundingClientRect();
+            return sum + height;
+          }, 0);
+          toggleMenu.style.height = `${menuHeight}px`;
+        }
+      },
+      true
+    );
     this.addEvent('click', '.home-wrapper', (e) => {
-      const toggleMenuWrapper = this.$target.querySelector(
-        '.toggle-menu-wrapper'
-      );
-      const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
-      if (!e.target.closest('.center') && toggleMenu) {
-        toggleMenu.classList.add('off');
-        setTimeout(() => {
-          while (toggleMenuWrapper.hasChildNodes()) {
-            toggleMenuWrapper.removeChild(toggleMenuWrapper.lastChild);
-          }
-        }, 300);
+      if (e.target.closest('.toggle-menu-wrapper')) return;
+      if (!document.querySelector('.toggle-menu').classList.contains('off')) {
+        this.toggleMenuOff();
+        return;
       }
     });
+  }
+  toggleMenuOff() {
+    const toggleMenu = this.$target.querySelector('.toggle-menu');
+    toggleMenu.style.height = `0px`;
+    setTimeout(() => {
+      toggleMenu.classList.add('off');
+    }, 400);
   }
 }
 

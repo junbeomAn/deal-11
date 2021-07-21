@@ -1,0 +1,50 @@
+.toggle-menu-wrapper {
+  width: 100%;
+  height: auto !important;
+  position: absolute;
+  top: 90%;
+  left: 0;
+  > .toggle-menu {
+    background-color: #fafafa;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: 0.3s;
+    height: 0;
+    &.off {
+      display: none;
+    }
+  }
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 1.1rem;
+    padding: 1em;
+    width: 100%;
+    height: 50px;
+    color: black;
+    border-radius: 0 !important;
+
+    &:nth-child(1) {
+      border-bottom: 1px solid #bbb;
+      border-top: 1px solid #bbb;
+    }
+  }
+}
+
+@keyframes toggle-down {
+  from {
+    height: 0px;
+  }
+  to {
+    height: 114px;
+  }
+}
+@keyframes toggle-off {
+  from {
+    height: 114px;
+  }
+  to {
+    height: 0px;
+  }
+}
