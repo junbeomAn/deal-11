@@ -9,6 +9,7 @@ class Store {
     products: [],
     user: {},
     rooms: [],
+    filter: '',
   };
   actions = {
     loginTrue: () => {
@@ -48,6 +49,9 @@ class Store {
     },
     setCurrentChatInfo: (chatInfo) => {
       this.setState('chatInfo', chatInfo);
+    },
+    setProductFilter: (filter) => {
+      this.setState('filter', filter);
     },
   };
   dispatch(funcName, args = {}) {
