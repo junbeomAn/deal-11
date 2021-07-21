@@ -11,26 +11,6 @@ import locationI from '../../assets/location.svg';
 import '../../scss/home.scss';
 import { BASE_URL } from '../../utils';
 
-const api = {
-  getToken: function () {
-    return localStorage.getItem('token');
-  },
-  fetchWithToken: function (url) {
-    return fetch(url, {
-      headers: {
-        token: this.getToken(),
-      },
-    })
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
-  },
-  fetch: function (url) {
-    return fetch(url)
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
-  },
-};
-
 export default class HomeWrapper extends Component {
   template() {
     return `
