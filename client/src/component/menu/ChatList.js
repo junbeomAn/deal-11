@@ -10,17 +10,7 @@ export default class ChatList extends Component {
     this.addEvent('click', '.chat-list', onClick);
   }
   template() {
-    const rooms = [
-      {
-        id: 1,
-        sender: 'hello',
-        image_url: '/home.png',
-        unread: 2,
-        last_content: '안녕하세요',
-        last_date: '2021-07-19T08:56:49.000Z',
-      },
-    ];
-    // const rooms = this.store.getState('rooms');
+    const rooms = this.store.getState('rooms');
     return rooms.length === 0
       ? `<span class="empty-message">채팅기록이 없습니다</span>`
       : `
