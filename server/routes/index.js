@@ -6,12 +6,6 @@ const router = express.Router();
 const { requiredLoginDecorator } = require('./utils.js');
 
 router.use('/product', productRouter);
-router.use(
-  '/chat',
-  function (req, res, next) {
-    if (requiredLoginDecorator(req, next)()) next();
-  },
-  chatRouter
-);
+router.use('/chat', chatRouter);
 
 module.exports = router;

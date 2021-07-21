@@ -4,7 +4,8 @@ const router = express.Router();
 const pool = require('../db/index.js');
 const createError = require('http-errors'); 
 const { selectOrInsertLocation } = require('./location.js');
-const { injectAuthStateToSession, runAsyncWrapper, requiredLoginDecorator } = require('./utils');
+const { runAsyncWrapper, requiredLoginDecorator } = require('./utils');
+const jwt = require('jsonwebtoken');
 
 const { 
   insertUserHasOneLocationQuery,
@@ -35,10 +36,16 @@ router.post('/signin', runAsyncWrapper(async (req, res, next) => {
     const [locationTwo] = await pool.execute(selectLocationNameQuery, [location_2_id]);
     locationArray.push(locationTwo[0].name);
   }
-  
-  const result = { id, username, location: locationArray };
-  injectAuthStateToSession(req, result);
-  res.send({ message: '로그인이 완료되었습니다.', result, ok: true });  
+  const SECRET_KEY = process.env.COOKIE_SECRET;
+  const payload = {
+    id,
+    username,
+    location: locationArray,
+  }
+  jwt.sign(payload, SECRET_KEY, {}, (err, token) => {
+    const result = { username, location: locationArray, token };
+    res.send({ message: '로그인이 완료되었습니다.', result, ok: true }); 
+  })
 }));
 
 router.post('/signup', runAsyncWrapper(async (req, res, next) => {
@@ -80,7 +87,6 @@ router.post('/signup', runAsyncWrapper(async (req, res, next) => {
   
 }));
 
-requiredLoginDecorator(router);
 router.get('/signout', (req, res, next) => {
   req.session.destroy(function(err) {
     if (err) { 
