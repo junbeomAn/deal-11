@@ -93,7 +93,7 @@ const selectCategoryItemsQuery = (location, category_id) => {
 };
 const selectMyProductQuery = () => {
   let returnQuery = whereLocation();
-  returnQuery += ` WHERE a.user_id = ? GROUP BY a.id ORDER BY a.created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
+  returnQuery += ` WHERE a.user_id = ? GROUP BY a.id ORDER BY a.created_at DESC`;
   return returnQuery;
 };
 
