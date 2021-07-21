@@ -5,27 +5,6 @@ import { $router } from '../../lib/router';
 
 import '../../scss/category.scss';
 
-const api = {
-  getProductByCategory: (url) => {
-    return fetch(url)
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
-  },
-  _getProductByCategory: () => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve({
-          ok: true,
-          result: [
-            { a: 1, b: 1 },
-            { a: 1, b: 1 },
-          ],
-        });
-      }, 1000);
-    });
-  },
-};
-
 export default class CategoryWrapper extends Component {
   template() {
     return `
@@ -83,7 +62,7 @@ class CategoryContents extends Component {
         return (
           acc +
           `
-        <li class="category-item" id="${i + 1}">
+        <li class="category-item" data-cid="${i + 1}">
           <div class="image-box"></div>
           <div class="item-name">${item}</div>
         </li>
@@ -97,25 +76,13 @@ class CategoryContents extends Component {
     const $item = e.target.closest('.category-item');
     if (!$item) return;
 
-    const page = this.store.getState('page');
-    const { location } = this.store.getState('user');
-    const qs = { page };
-    if (location.length) {
-      qs.location = location[0];
+    let current = e.target;
+    while (!current.classList.contains('category-item')) {
+      current = current.parentNode;
     }
-    console.log(location, qs.location);
-    const url = combineWithQueryString(
-      `${BASE_URL}/product/category/${$item.id}`,
-      qs
-    );
-
-    api.getProductByCategory(url).then((res) => {
-      if (res.ok) {
-        this.store.dispatch('setProductFilter', 'category');
-        this.store.dispatch('setProducts', res.result);
-        $router.push('/home');
-      }
-    });
+    const categoryId = current.dataset.cid;
+    this.store.setState('categoryId', categoryId);
+    $router.redirect('/home');
   }
   setEvent() {
     this.handleCategoryClick = this.handleCategoryClick.bind(this);
