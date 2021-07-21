@@ -1,17 +1,17 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const session = require('express-session');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 dotenv.config();
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 
+const { runAsyncWrapper } = require('./routes/utils');
 const dbInit = require('./db/init');
 
 const app = express();
@@ -23,28 +23,37 @@ global.appPublic = path.resolve(__dirname + '/public');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(express.static('public'));
 app.use(cors());
 
-app.use(
-  session({
-    secret: process.env.COOKIE_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { httpOnly: true },
-  })
-);
-
 app.use('/auth', authRouter);
 app.use('/api/v1', indexRouter);
-app.use('/myinfo', (req, res, next) => {
-  if (req.session.user) {
-    res.send({ login: true, user: req.session.user });
-  } else {
-    res.send({ login: false });
-  }
-});
+app.use(
+  '/myinfo',
+  runAsyncWrapper(async (req, res, next) => {
+    const myinfo = await new Promise((resolve, reject) => {
+      const { token } = req.headers;
+      const SECRET_KEY = process.env.COOKIE_SECRET;
+
+      if (!token) {
+        resolve(false);
+      }
+
+      jwt.verify(token, SECRET_KEY, {}, (err, decode) => {
+        if (!decode) {
+          resolve(false);
+        } else {
+          resolve(decode);
+        }
+      });
+    });
+    if (myinfo) {
+      res.send({ login: true, myinfo });
+    } else {
+      res.send({ login: false });
+    }
+  })
+);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
