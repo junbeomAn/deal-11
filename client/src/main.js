@@ -93,7 +93,11 @@ function init() {
       store.dispatch('setIsLogin', isLogin);
       if (isLogin) {
         const user = res.user;
-        store.setState('user', user);
+        store.setState('user', {
+          id: user.userId,
+          location: user.location,
+          username: user.username,
+        });
       }
       initRouter({ $app, routes, store });
     })

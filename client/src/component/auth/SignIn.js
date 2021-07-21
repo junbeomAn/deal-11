@@ -3,30 +3,10 @@ import Button from '../shared/Button';
 import NavBar from '../shared/NavBar';
 import Input from '../shared/Input';
 import { $router } from '../../lib/router';
-import { inputChangeHandler, focusoutHandler } from './utils';
 import { BASE_URL } from '../../utils';
 import '../../scss/signin.scss';
 
-const api = {
-  signIn: (url, data) => {
-    return fetch(url, {
-      method: 'POST',
-      // mode: 'cors',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }).then((res) => res.json());
-  },
-  _signIn: () => {
-    // test usage
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve({ ok: true });
-      }, 800);
-    });
-  },
-};
+import promise from '../../lib/api';
 
 export default class SignInWrapper extends Component {
   template() {
@@ -53,6 +33,26 @@ class SignIn extends Component {
     const $form = this.$target.querySelector('.form-signin');
     new NavBar($navbar, { background: 'grey', title: '로그인' }, this.store);
     new Form($form, {}, this.store);
+    this.$target
+      .querySelector('.form-signin')
+      .addEventListener('submit', (e) => {
+        e.preventDefault();
+        const header = {
+          'Content-Type': 'application/json',
+        };
+        const data = {
+          username: username.value,
+        };
+        promise(API_ENDPOINT + '/auth/signin', 'POST', header, data)
+          .then((res) => {
+            this.store.dispatch('setIsLogin', true);
+            this.store.setState('user', res.result);
+            $router.redirect('/home');
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
   }
 }
 
@@ -76,40 +76,6 @@ class Form extends Component {
       error: '',
     };
   }
-  handleSignInClick(e) {
-    e.preventDefault();
-    if (!e.target.closest('.signin-button-wrapper button')) return;
-
-    const username = this.store.getState('username');
-    const url = `${BASE_URL}/auth/signin`;
-
-    if (!username) {
-      this.setState({ error: '아이디를 입력해주세요' });
-      return;
-    }
-
-    api._signIn(url, { username }).then((res) => {
-      if (res.ok === true) {
-        // user 정보 저장?!, res.result
-        const { result } = res;
-        this.store.dispatch('inputValue', {
-          inputName: 'username',
-          value: '',
-        });
-        this.store.dispatch('setIsLogin', true);
-        this.store.dispatch('setUserInfo', result);
-        // store 로그인 상태 및 로딩 상태 변경 필요
-        if (this.$state.error) {
-          this.setState({ error: '' });
-        }
-        $router.redirect('/home');
-      } else {
-        this.setState({
-          error: res.message || '잘못된 아이디 입니다.',
-        });
-      }
-    });
-  }
 
   mounted() {
     this.childReRender([
@@ -119,8 +85,10 @@ class Form extends Component {
         props: {
           placeholder: '아이디를 입력하세요',
           eventTarget: '.signin-wrapper',
-          onChange: inputChangeHandler(this.store, 'username'),
-          onFocusout: focusoutHandler,
+          id: 'username',
+          name: 'username',
+          onChange: () => {},
+          onFocusout: () => {},
         },
       },
       {
@@ -132,7 +100,8 @@ class Form extends Component {
           text: '로그인',
           rectangle: true,
           eventTarget: '.signin-wrapper',
-          onClick: this.handleSignInClick.bind(this),
+          type: 'submit',
+          onClick: () => {},
         },
       },
       {
