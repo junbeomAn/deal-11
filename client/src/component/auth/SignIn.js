@@ -37,6 +37,10 @@ class SignIn extends Component {
       .querySelector('.form-signin')
       .addEventListener('submit', (e) => {
         e.preventDefault();
+        if (username.value.length === 0) {
+          username.parentNode.classList.add('error');
+          return;
+        }
         const header = {
           'Content-Type': 'application/json',
         };
@@ -70,9 +74,9 @@ class Form extends Component {
       </div> 
       <div class="input-wrapper">
       </div>
-      <div class="signin-button-wrapper">
+      <div class="signin-button-wrapper button-wrapper">
       </div>
-      <div class="signup-button-wrapper">
+      <div class="signup-button-wrapper button-wrapper">
       </div>
     `;
   }
@@ -92,6 +96,7 @@ class Form extends Component {
           eventTarget: '.signin-wrapper',
           id: 'username',
           name: 'username',
+          errormessage: '아이디가 입력되지 않았습니다.',
           onChange: () => {},
           onFocusout: () => {},
         },
@@ -114,7 +119,7 @@ class Form extends Component {
         selector: '.signup-button-wrapper',
         props: {
           color: 'transparent',
-          size: 'large',
+          size: 'none',
           text: '회원가입',
           eventTarget: '.signin-wrapper',
           onClick: (e) => {
