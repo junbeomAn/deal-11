@@ -45,8 +45,13 @@ class SignIn extends Component {
         };
         promise(API_ENDPOINT + '/auth/signin', 'POST', header, data)
           .then((res) => {
+            const { username, location, token } = res.result;
             this.store.dispatch('setIsLogin', true);
-            this.store.setState('user', res.result);
+            this.store.dispatch('setUserInfo', {
+              username,
+              location,
+            });
+            localStorage.setItem('token', token);
             $router.redirect('/home');
           })
           .catch((err) => {
