@@ -101,7 +101,7 @@ class CategoryContents extends Component {
       location: location[0],
     });
 
-    api._getProductByCategory(url).then((res) => {
+    api.getProductByCategory(url).then((res) => {
       if (res.ok) {
         this.store.dispatch('setProducts', res.result);
         $router.push('/home');
