@@ -38,7 +38,13 @@ app.use(
 
 app.use('/auth', authRouter);
 app.use('/api/v1', indexRouter);
-
+app.use('/myinfo', (req, res, next) => {
+  if (req.session.user) {
+    res.send({ login: true, user: req.session.user });
+  } else {
+    res.send({ login: false });
+  }
+});
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
