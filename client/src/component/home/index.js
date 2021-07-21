@@ -44,7 +44,6 @@ class Home extends Component {
           <button class="menu-btn"><img src=${menuI}></button>
         </div>
       </nav>
-      <div class="nav-occupant"></div>
       <div class="product-list-wrapper"></div>
       <button class="plus-btn">
         <svg viewBox="0 0 100 100">
@@ -146,7 +145,10 @@ class Home extends Component {
     );
     this.addEvent('click', '.home-wrapper', (e) => {
       if (e.target.closest('.toggle-menu-wrapper')) return;
-      if (!document.querySelector('.toggle-menu').classList.contains('off')) {
+      if (
+        document.querySelector('.toggle-menu') &&
+        !document.querySelector('.toggle-menu').classList.contains('off')
+      ) {
         this.toggleMenuOff();
         return;
       }
@@ -154,10 +156,13 @@ class Home extends Component {
 
     this.addEvent('click', '.menu-btn', (e) => {
       if (!e.target.closest('img')) return;
-      if (!this.store.getState('isLogin')) return;
+      if (!this.store.getState('isLogin')) {
+        $router.push('/signin', 1);
+        return;
+      }
 
-      const url = `${BASE_URL}/product/mine?page=1`;
-      api.fetchWithToken(url).then((res) => {
+      const url = API_ENDPOINT + `/api/v1/product/mine`;
+      promise(url, 'GET').then((res) => {
         if (res.ok) {
           this.store.dispatch('setProducts', res.result);
           $router.push('/menu', 1);

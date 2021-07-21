@@ -89,7 +89,6 @@ $app.addEventListener('scroll', () => {
 function init() {
   promise(API_ENDPOINT + '/myinfo', 'GET')
     .then((res) => {
-      console.log(res);
       const isLogin = res.login;
       store.dispatch('setIsLogin', isLogin);
       if (isLogin) {

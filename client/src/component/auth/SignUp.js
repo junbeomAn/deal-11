@@ -7,27 +7,6 @@ import { inputChangeHandler, focusoutHandler } from './utils';
 import promise from '../../lib/api';
 import '../../scss/signup.scss';
 
-const api = {
-  signUp: (url, data) => {
-    return fetch(url, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(data),
-      // mode: 'cors',
-    }).then((res) => res.json());
-  },
-  _signUp: () => {
-    // test usage
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve({ ok: true });
-      }, 800);
-    });
-  },
-};
-
 export default class SignUpWrapper extends Component {
   template() {
     return `
@@ -162,7 +141,9 @@ class Form extends Component {
           rectangle: true,
           eventTarget: '.signup-wrapper',
           type: 'submit',
-          onClick: (e) => {},
+          onClick: (e) => {
+            e.preventDefault();
+          },
         },
       },
     ]);
