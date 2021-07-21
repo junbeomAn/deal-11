@@ -2,6 +2,7 @@ import Component from '../../core/Component';
 import { $router } from '../../lib/router';
 import Modal from './Modal';
 import ToggleMenu from './ToggleMenu';
+import promise from '../../lib/api';
 
 import categoryI from '../../assets/category.svg';
 import accountI from '../../assets/account.svg';
@@ -76,6 +77,9 @@ class Home extends Component {
         },
       ]);
     }
+  }
+  shouldComponentUpdate(prevState, nextState) {
+    return false;
   }
   setup() {
     this.store.dispatch('modalChange', false);
