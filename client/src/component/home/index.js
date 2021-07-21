@@ -2,6 +2,7 @@ import Component from '../../core/Component';
 import { $router } from '../../lib/router';
 import Modal from './Modal';
 import ToggleMenu from './ToggleMenu';
+import ProductList from '../menu/ProductList';
 
 import categoryI from '../../assets/category.svg';
 import accountI from '../../assets/account.svg';
@@ -20,6 +21,11 @@ const api = {
         token: this.getToken(),
       },
     })
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
+  },
+  fetch: function (url) {
+    return fetch(url)
       .then((res) => res.json())
       .catch((err) => console.error(err));
   },
@@ -58,6 +64,8 @@ class Home extends Component {
           <button class="menu-btn"><img src=${menuI}></button>
         </div>
       </nav>
+      <div class="nav-occupant"></div>
+      <div class="product-list-wrapper"></div>
       <button class="plus-btn">
         <svg viewBox="0 0 100 100">
           <line x1="50" y1="30" x2="50" y2="70"/>
@@ -68,7 +76,8 @@ class Home extends Component {
     `;
   }
   mounted() {
-    const text = this.$state.login ? '동네' : '로그인 해주세요';
+    const user = this.store.getState('user');
+    const text = user.username ? user.location[0] : '로그인 해주세요';
     this.childReRender([
       {
         childClass: Location,
@@ -79,6 +88,49 @@ class Home extends Component {
         },
       },
     ]);
+    /**
+     * 만약 필터 있으면 그냥 렌더링 및 필터 지움, 없으면 데이터 요청 후 렌더링.
+     */
+    const filter = this.store.getState('filter');
+    if (filter) {
+      this.childReRender([
+        {
+          childClass: ProductList,
+          selector: '.product-list-wrapper',
+          props: {
+            listType: '',
+            emptyMessage: '등록된 상품이 없습니다',
+            onClick: () => {},
+          },
+        },
+      ]);
+      this.store.dispatch('setProductFilter', '');
+    } else {
+      const url = `${BASE_URL}/product`;
+      api.fetch(url).then((res) => {
+        this.store.dispatch('setProducts', res.result);
+        this.childReRender([
+          {
+            childClass: ProductList,
+            selector: '.product-list-wrapper',
+            props: {
+              listType: '',
+              emptyMessage: '등록된 상품이 없습니다',
+              onClick: (e) => {
+                if (!e.target.closest('.product-list .list-item')) return;
+
+                const item = e.target.closest('.list-wrapper .list-item');
+                const url = `${BASE_URL}/product/${item.id}`;
+                api.fetch(url).then((res) => {
+                  this.store.dispatch('setCurrentProduct', res.result);
+                  $router.push('/product');
+                });
+              },
+            },
+          },
+        ]);
+      });
+    }
   }
   setup() {
     this.store.dispatch('modalChange', false);

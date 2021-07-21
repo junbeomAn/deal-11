@@ -11,7 +11,7 @@ import '../../scss/productlist.scss';
 
 export default class ProductList extends Component {
   setEvent() {
-    const { onClick, onOptionClick } = this.$props;
+    const { onClick, onOptionClick = () => {} } = this.$props;
     this.addEvent('click', '.product-list', onClick);
     this.addEvent('click', '.option', onOptionClick);
   }

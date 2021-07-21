@@ -11,36 +11,6 @@ import socket from '../Chat/socket';
 import 'moment/locale/ko';
 import '../../scss/menu.scss';
 
-const products = [
-  {
-    title: '다용도 캐비닛',
-    location: '역삼동',
-    created_at: '1일전',
-    price: '369,000원',
-    chatCount: 1,
-    likeCount: 1,
-    like: false,
-  },
-  {
-    title: '다용도 캐비닛',
-    location: '역삼동',
-    created_at: '1일전',
-    price: '369,000원',
-    chatCount: 1,
-    likeCount: 1,
-    like: true,
-  },
-  {
-    title: '다용도 캐비닛',
-    location: '역삼동',
-    created_at: '1일전',
-    price: '369,000원',
-    chatCount: 1,
-    likeCount: 1,
-    like: false,
-  },
-];
-
 const api = {
   getToken: function () {
     return localStorage.getItem('token');

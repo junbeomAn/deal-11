@@ -7,7 +7,9 @@ import '../../scss/category.scss';
 
 const api = {
   getProductByCategory: (url) => {
-    return fetch(url).then((res) => res.json());
+    return fetch(url)
+      .then((res) => res.json())
+      .catch((err) => console.error(err));
   },
   _getProductByCategory: () => {
     return new Promise((resolve, reject) => {
@@ -92,17 +94,24 @@ class CategoryContents extends Component {
     `;
   }
   handleCategoryClick(e) {
-    if (!e.target.closest('.category-item')) return;
+    const $item = e.target.closest('.category-item');
+    if (!$item) return;
 
     const page = this.store.getState('page');
-    const location = this.store.getState('location');
-    const url = combineWithQueryString(BASE_URL, {
-      page,
-      location: location[0],
-    });
+    const { location } = this.store.getState('user');
+    const qs = { page };
+    if (location.length) {
+      qs.location = location[0];
+    }
+    console.log(location, qs.location);
+    const url = combineWithQueryString(
+      `${BASE_URL}/product/category/${$item.id}`,
+      qs
+    );
 
     api.getProductByCategory(url).then((res) => {
       if (res.ok) {
+        this.store.dispatch('setProductFilter', 'category');
         this.store.dispatch('setProducts', res.result);
         $router.push('/home');
       }
