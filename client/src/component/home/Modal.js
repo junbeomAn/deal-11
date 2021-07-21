@@ -1,4 +1,5 @@
 import Component from '../../core/Component.js';
+import { $router } from '../../lib/router.js';
 
 export default class ModalWrapper extends Component {
   template() {
@@ -16,11 +17,11 @@ class Modal extends Component {
   template() {
     return `
       <div>
-        <div class="modal-btn-container">
+        <div class="modal-btn-container post">
           <p>게시하기</p>
           <div><i class="fas fa-pencil-alt"></i></div>
         </div>
-        <div class="modal-btn-container">
+        <div class="modal-btn-container mycity">
           <p>내 동네 추가하기</p>
           <div><i class="fas fa-building"></i></div>
         </div>
@@ -41,6 +42,10 @@ class Modal extends Component {
             modal.removeChild(modal.lastChild);
           }
         }, 300);
+      } else {
+        if (e.target.closest('.post')) {
+          $router.push('/post', 3);
+        }
       }
     });
   }
