@@ -2,14 +2,15 @@ import Component from '../../core/Component';
 import { $router } from '../../lib/router';
 import Modal from './Modal';
 import ToggleMenu from './ToggleMenu';
+import ProductPreview from '../shared/ProductPreview';
 import promise from '../../lib/api';
 
 import categoryI from '../../assets/category.svg';
 import accountI from '../../assets/account.svg';
 import menuI from '../../assets/menu.svg';
 import locationI from '../../assets/location.svg';
+import emptyImage from '../../assets/empty.jpeg';
 import '../../scss/home.scss';
-import { BASE_URL } from '../../utils';
 
 export default class HomeWrapper extends Component {
   template() {
@@ -18,11 +19,31 @@ export default class HomeWrapper extends Component {
     `;
   }
   mounted() {
-    new Home(
-      this.$target.querySelector('.home-wrapper'),
-      this.$props,
-      this.store
-    );
+    let url = API_ENDPOINT + '/api/v1/product';
+    const categoryId = this.store.getState('categoryId');
+    if (categoryId) url += `/category/${categoryId}`;
+    if (this.store.getState('isLogin')) {
+      url += `?location=${
+        this.store.getState('user').location[this.store.getState('selected')]
+      }`;
+    }
+    promise(url, 'GET')
+      .then((res) => {
+        if (res.ok) {
+          new Home(
+            document.querySelector('.home-wrapper'),
+            {
+              products: res.result,
+            },
+            this.store
+          );
+        } else {
+          return new Error(res);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
@@ -58,6 +79,19 @@ class Home extends Component {
     const text = this.$state.login
       ? this.store.getState('user').location[this.store.getState('selected')]
       : '로그인 해주세요';
+    const productListElem = this.$target.querySelector('.product-list-wrapper');
+    if (this.$props.products.length) {
+      this.$props.products.forEach((product) => {
+        new ProductPreview(productListElem, product, this.store);
+      });
+    } else {
+      const emptyElem = document.createElement('img');
+      const emptyText = document.createElement('p');
+      emptyText.innerText = '물건이 아직 없네요.';
+      emptyElem.src = emptyImage;
+      productListElem.classList.add('not-product');
+      productListElem.append(emptyElem, emptyText);
+    }
     this.childReRender([
       {
         childClass: Location,
@@ -107,12 +141,14 @@ class Home extends Component {
       }
       if (prevModalOn) {
         this.$target.querySelector('.modal > div').classList.add('down');
+        document.querySelector('#app').removeAttribute('style');
         setTimeout(() => {
           modal.classList.remove('on');
           while (modal.hasChildNodes()) modal.removeChild(modal.lastChild);
         }, 300);
       } else {
         modal.classList.add('on');
+        document.querySelector('#app').style.overflow = 'hidden';
         this.childReRender([
           {
             childClass: Modal,

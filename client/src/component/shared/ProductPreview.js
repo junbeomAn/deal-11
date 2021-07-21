@@ -1,20 +1,27 @@
 import Component from '../../core/Component';
+import { priceChange } from '../../utils';
+import moment from 'moment';
 
+import empty from '../../assets/empty.jpeg';
 import '../../scss/preview.scss';
 
 export default class ProductPreview extends Component {
   template() {
-    const { id, title, location, image_url, date, price, like } = this.$props;
+    const { id, title, location, image_url, created_at, price, like_count } =
+      this.$props;
     return `
       <div class="product-preview-wrapper" data-pid="${id}">
-        <img src="${API_ENDPOINT + image_url[0]}">
-        <div class="product_info">
+        <img src="${image_url.length ? API_ENDPOINT + image_url[0] : empty}">
+        <div class="product-info">
           <div class="title">${title}</div>
-          <div class="location time">${location} • ${date}</div>
-          <div class="price">${price}</div>
+          <div class="location time">${location} • ${moment(
+      created_at
+    ).fromNow()}</div>
+          <div class="price">${priceChange(price)}</div>
         </div>
-        <div class="likeCount">
-          ${like}
+        <div class="like-count">
+          <i class="far fa-heart"></i>
+          ${like_count}
         </div>
       </div>
     `;
