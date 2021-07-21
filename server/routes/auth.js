@@ -28,7 +28,7 @@ router.post('/signin', runAsyncWrapper(async (req, res, next) => {
 
   const { id, location_1_id, location_2_id } = results[0];
   const locationArray = [];
-
+  
   const [locationOne] = await pool.execute(selectLocationNameQuery, [location_1_id]);
   locationArray.push(locationOne[0].name);
 
@@ -43,7 +43,7 @@ router.post('/signin', runAsyncWrapper(async (req, res, next) => {
     location: locationArray,
   }
   jwt.sign(payload, SECRET_KEY, {}, (err, token) => {
-    const result = { username, location: locationArray, token };
+    const result = { id, username, location: locationArray, token };
     res.send({ message: '로그인이 완료되었습니다.', result, ok: true }); 
   })
 }));
