@@ -8,6 +8,7 @@ class Store {
     page: 1,
     products: [],
     user: {},
+    rooms: [],
   };
   actions = {
     loginTrue: () => {
