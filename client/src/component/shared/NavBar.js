@@ -26,7 +26,7 @@ class NavBar extends Component {
   template() {
     const { title, right } = this.$props;
     return `
-        <button class="nav-bar-btn" >
+        <button class="nav-bar-btn back-btn" >
           <img src=${arrowIcon} alt="go-back">
         </button>
         <div class="title">
@@ -35,7 +35,9 @@ class NavBar extends Component {
         ${
           right
             ? `
-            <button class="nav-bar-btn ${right === 'done' ? 'done' : 'exit'}">
+            <button class="nav-bar-btn right-btn ${
+              right === 'done' ? 'done' : 'exit'
+            }">
               <img src=${right === 'done' ? doneIcon : exitIcon} alt="next">
             </button>
           `
@@ -45,7 +47,7 @@ class NavBar extends Component {
     `;
   }
   handleBackClick(e) {
-    if (!e.target.closest('.nav-bar-btn')) return;
+    if (!e.target.closest('.nav-bar-btn.back-btn')) return;
     history.back();
   }
   setEvent() {
@@ -53,6 +55,6 @@ class NavBar extends Component {
     this.handleBackClick = this.handleBackClick.bind(this);
     this.addEvent('click', '.nav-bar-shared', this.handleBackClick);
     if (handleRightClick)
-      this.addEvent('click', '.nav-bar-shared', handleRightClick);
+      this.addEvent('click', '.nav-bar-shared.right-btn', handleRightClick);
   }
 }

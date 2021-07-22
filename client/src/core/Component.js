@@ -39,7 +39,7 @@ export default class Componet {
     if (this.shouldComponentUpdate(prevState, this.$state)) this.render();
   }
   // event add 하기
-  addEvent(eventType, selector, callback) {
+  addEvent(eventType, selector, callback, capture = false) {
     // 없을 때를 방지하기 위해서
     const children = [...this.$target.querySelectorAll(selector)];
     // selector로 명시한 노드보다 더 하위 요소가 선택되었을 때를 처리하기 위해
@@ -47,10 +47,14 @@ export default class Componet {
     const isRight = (target) =>
       children.includes(target) || target.closest(selector);
 
-    this.$target.addEventListener(eventType, (e) => {
-      if (!isRight(e.target)) return;
-      callback(e);
-    });
+    this.$target.addEventListener(
+      eventType,
+      (e) => {
+        if (!isRight(e.target)) return;
+        callback(e);
+      },
+      capture
+    );
   }
   /**
    * options: array

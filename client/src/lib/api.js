@@ -1,7 +1,12 @@
-export default (url, method, headers = {}, body = {}) => {
+export default (url, method, headers = {}, body = {}, form = false) => {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
+    const token = localStorage.getItem('token');
+    if (token) {
+      xhr.setRequestHeader('token', token);
+    }
+
     for (let [key, value] of Object.entries(headers)) {
       xhr.setRequestHeader(key, value);
     }
@@ -12,6 +17,10 @@ export default (url, method, headers = {}, body = {}) => {
         resolve(JSON.parse(xhr.response));
       }
     };
-    xhr.send(JSON.stringify(body));
+    if (!form) {
+      xhr.send(JSON.stringify(body));
+    } else {
+      xhr.send(body);
+    }
   });
 };

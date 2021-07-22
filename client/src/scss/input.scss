@@ -1,8 +1,31 @@
 @import 'size.scss';
 @import 'theme.scss';
 
+.input-wrapper {
+  padding-bottom: 2rem;
+  position: relative;
+
+  .input-error-message {
+    color: $danger;
+    font-size: 0.7rem;
+    z-index: 1;
+    position: absolute;
+    left: 3px;
+    bottom: 2rem;
+    display: none;
+    animation: error-animation 0.3s forwards;
+  }
+  &.error {
+    .input-error-message {
+      display: block;
+    }
+  }
+}
+
 .input {
   border-radius: 8px;
+  position: relative;
+  z-index: 2;
   &:focus {
     outline: none;
   }
@@ -30,5 +53,13 @@
   }
   &.typing {
     border: 1px solid $baemin-primary;
+  }
+}
+@keyframes error-animation {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 110%, 0);
   }
 }

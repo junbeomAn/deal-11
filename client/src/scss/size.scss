@@ -31,3 +31,7 @@ $border-weight-thin: 1px;
   height: 36px;
   padding: 8px 16px;
 }
+
+@mixin button-none() {
+  padding: 8px 16px;
+}

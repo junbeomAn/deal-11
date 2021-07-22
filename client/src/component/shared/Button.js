@@ -4,11 +4,11 @@ import '../../scss/Button.scss';
 
 export default class Button extends Component {
   template() {
-    const { size, color, text, rectangle, type } = this.$props;
+    const { size, color, text, rectangle, type, disabled } = this.$props;
     return `
-      <button class="${size || 'large'} ${color || 'primary'} ${
-      rectangle ? 'rectangle' : ''
-    }", type="${type || ''}">
+      <button ${disabled ? 'disabled' : ''} class="${size || 'large'} ${
+      color || 'primary'
+    } ${rectangle ? 'rectangle' : ''}", type="${type || ''}">
         ${text}
       </button>
     `;
