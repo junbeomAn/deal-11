@@ -1,5 +1,6 @@
 import Component from '../../core/Component';
 import promise from '../../lib/api';
+import { $router } from '../../lib/router';
 
 import '../../scss/togglemenu.scss';
 
@@ -41,6 +42,11 @@ class ToggleMenu extends Component {
         .catch((err) => {
           console.log(err);
         });
+    });
+    this.addEvent('click', '.reload-btn', (e) => {
+      const selected = e.target.dataset.selected;
+      this.store.setState('selected', selected);
+      $router.redirect('/home');
     });
   }
 }
