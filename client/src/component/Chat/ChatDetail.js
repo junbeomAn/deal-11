@@ -132,7 +132,7 @@ class ChatDetail extends Component {
   }
 
   handleRightClick(e) {
-    if (!e.target.closest('.nav-bar-btn .exit')) return;
+    if (!e.target.closest('.nav-bar-btn.exit')) return;
     const { room } = this.store.getState('chatInfo');
     socket.emit('leaveRoom', { room });
     $router.push('/menu', 1);
