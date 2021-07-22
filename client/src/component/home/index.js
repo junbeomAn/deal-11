@@ -206,18 +206,7 @@ class Home extends Component {
 
     this.addEvent('click', '.menu-btn', (e) => {
       if (!e.target.closest('img')) return;
-      if (!this.store.getState('isLogin')) {
-        $router.push('/signin', 1);
-        return;
-      }
-
-      const url = API_ENDPOINT + `/api/v1/product/mine`;
-      promise(url, 'GET').then((res) => {
-        if (res.ok) {
-          this.store.dispatch('setProducts', res.result);
-          $router.push('/menu', 1);
-        }
-      });
+      $router.push('/menu', 1);
     });
   }
   toggleMenuOff() {

@@ -40,6 +40,7 @@ const routes = [
   { path: '/chatDetail', component: ChatDetail, middleware: loginMiddleWare },
   { path: '/post', component: Post, middleware: loginMiddleWare },
   { path: '/location', component: Location, middleware: loginMiddleWare },
+  { path: '/change', component: Post, middleware: changeDetailHandler },
 ];
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
@@ -47,7 +48,14 @@ let scrollHeight = 0;
 let remainScroll = 0;
 let scrollRange = 0;
 let scrollTimeOut = null;
-
+function changeDetailHandler() {
+  if (!store.getState('putPost')) {
+    $router.redirect('/home');
+    return false;
+  } else {
+    return true;
+  }
+}
 function detailRoutingMiddelWare() {
   if (!store.getState('productId')) {
     $router.redirect('/home');

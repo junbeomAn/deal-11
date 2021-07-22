@@ -18,6 +18,7 @@ $option-menu-top: 29px;
 .list-container {
   .menu-tab {
     .tab-list {
+      position: relative;
       display: flex;
       justify-content: space-around;
       height: $tab-list-height;
@@ -34,12 +35,42 @@ $option-menu-top: 29px;
         cursor: pointer;
         &.active {
           color: $baemin-primary;
-          border-bottom: $border-weight solid $baemin-primary;
         }
+      }
+      > .pin {
+        position: absolute;
+        height: 3px;
+        width: $tab-width;
+        background-color: $baemin-primary;
+        border-radius: 1px;
+        bottom: 0;
+        left: 0;
+        transform: translate3d(0, 50%, 0);
       }
     }
   }
   .list-wrapper {
     min-height: 85vh;
+  }
+}
+.my-like-wrapper,
+.my-product-wrapper {
+  > .product-preview-wrapper {
+    border-bottom: 1px solid $line-grey;
+  }
+  &.empty {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    > img {
+      margin: 1rem 0;
+    }
+    > h2 {
+      font-size: 1.2rem;
+      padding: 0.5em;
+      font-weight: bold;
+    }
   }
 }
