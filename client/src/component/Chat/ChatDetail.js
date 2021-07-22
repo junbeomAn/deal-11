@@ -23,29 +23,17 @@ export default class ChatDetailWrapper extends Component {
 
 class ChatDetail extends Component {
   setEvent() {
-    this.addEvent('click', '.chat-detail-wrapper', this.onSubmit.bind(this));
+    this.addEvent('submit', '.chat-form', this.onSubmit.bind(this));
   }
 
   template() {
-    // const {
-    //   product: { image_url: imageUrl, status = '판매중', title, price },
-    // } = this.$store.getState('chatInfo');
-    const product = [
-      {
-        image_url: [
-          '/images/67de003dd22fd7bbf64939c1e440a33570cc1626674202027.png',
-          '/images/8dc09bfc1a7d8515af8ab6e12464a04a4a451626674202031.png',
-        ],
-        title: '안녕하세요gdgd',
-        price: 9999,
-      },
-    ];
+    const { product } = this.store.getState('chatInfo');
     const {
+      id,
       image_url: imageUrl,
       status = '판매중',
       title,
       price,
-      id,
     } = product[0];
 
     return `
@@ -72,9 +60,9 @@ class ChatDetail extends Component {
       <form class="chat-form">
         <div class="chat-input-wrapper">
         </div>
-        <div class="chat-send-wrapper" >
+        <button type="submit" class="chat-send-wrapper" >
           <img src="${sendIcon}" alt="send" role="button"/>
-        </div>
+        </button>
       </form>
     `;
   }
@@ -90,9 +78,11 @@ class ChatDetail extends Component {
     return opponent.fromId;
   }
 
+  getToken() {
+    return localStorage.getItem('token');
+  }
   onSubmit(e) {
-    if (!e.target.closest('.chat-send-wrapper')) return;
-
+    e.preventDefault();
     const $input = this.$target.querySelector('.chat-input-wrapper input');
     if (!$input.value) return;
 
@@ -103,9 +93,8 @@ class ChatDetail extends Component {
     const sendInfo = {
       productId,
       toId: this.getToId(messages),
+      token: this.getToken(),
     };
-    // const room = 1;
-    // const sendInfo = {};
     socket.emit('message', { msg: $input.value, room, sendInfo });
     $input.value = '';
   }
@@ -114,7 +103,7 @@ class ChatDetail extends Component {
     const { id } = this.store.getState('user');
 
     if (toId === id) {
-      return 'oppoent';
+      return 'opponent';
     } else {
       return 'mine';
     }
@@ -134,15 +123,13 @@ class ChatDetail extends Component {
   }
 
   initChatListener() {
-    // socket.emit('joinRoom', { room: 1 });
-    // console.log('room1 joined!!');
     const $list = this.$target.querySelector('.chat-bubble-list');
-
-    socket.on('message', function ({ msg, toId }) {
+    this.getBubbleFormat = this.getBubbleFormat.bind(this);
+    socket.on('message', ({ msg, toId }) => {
       const $itemWrapper = this.getBubbleFormat(msg);
       const owner = this.getMessageOwner(toId);
       $itemWrapper.classList.add(owner);
-      $list.appendChild(itemWrapper);
+      $list.appendChild($itemWrapper);
     });
   }
 
@@ -158,9 +145,7 @@ class ChatDetail extends Component {
       '.chat-bubble-list-wrapper'
     );
     const $input = this.$target.querySelector('.chat-input-wrapper');
-    // const { chatTarget, room } = this.store.getState('chatInfo');
-    const chatTarget = 'user1';
-    const room = '3';
+    const { chatTarget, room } = this.store.getState('chatInfo');
 
     new NavBar(
       $navbar,
