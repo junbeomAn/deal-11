@@ -107,11 +107,11 @@ $nav-height: 65px;
 }
 .modal-wrapper {
   display: none;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   z-index: 4;
   background-color: black;
   opacity: 0.5;
