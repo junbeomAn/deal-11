@@ -140,6 +140,21 @@ class Detail extends Component {
       this.store.setState('putPost', this.$props);
       $router.push('/change', 4);
     });
+    this.addEvent('click', '.delete', () => {
+      const { id } = this.$props;
+      const url = API_ENDPOINT + `/api/v1/product/${id}`;
+      promise(url, 'DELETE')
+        .then((res) => {
+          if (res.ok) {
+            $router.redirect('/home');
+          } else {
+            throw new Error(res);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    });
     this.addEvent(
       'click',
       '.detail-wrapper',
