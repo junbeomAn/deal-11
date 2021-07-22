@@ -24,7 +24,6 @@ export default class ProductList extends Component {
       : `
       <ul class="product-list product-list-page-1">
       ${products.reduce((acc, product) => {
-        console.log(product);
         const {
           id,
           title,
