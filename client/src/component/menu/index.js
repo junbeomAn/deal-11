@@ -1,37 +1,14 @@
 import Component from '../../core/Component';
 import NavBar from '../shared/NavBar';
-import MenuTab from './MenuTab';
-import ProductList from './ProductList';
 import ChatList from './ChatList';
+import MyProduct from './MyProduct';
+import MyLike from './MyLike';
 
 import { $router } from '../../lib/router';
-import { BASE_URL, combineWithQueryString } from '../../utils';
 import socket from '../Chat/socket';
 
 import 'moment/locale/ko';
 import '../../scss/menu.scss';
-
-const api = {
-  getToken: function () {
-    return localStorage.getItem('token');
-  },
-  fetchWithToken: function (url) {
-    return fetch(url, {
-      headers: {
-        token: this.getToken(),
-      },
-    })
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
-  },
-  _fetch: (url) => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve({ ok: true, result: products });
-      }, 800);
-    });
-  },
-};
 
 export default class MenuWrapper extends Component {
   template() {
@@ -48,10 +25,26 @@ export default class MenuWrapper extends Component {
 
 class Menu extends Component {
   template() {
+    const { active } = this.$state;
     return `
       <div class="navbar-wrapper"></div>
       <div class="list-container">
-        <div class="menu-tab-wrapper"></div>
+        <div class="menu-tab-wrapper">
+          <nav class="menu-tab">
+            <ul class="tab-list">
+              <li class="tab ${
+                active === 'salelist' ? 'active' : ''
+              }" id="salelist">판매목록</li>
+              <li class="tab ${
+                active === 'chatlist' ? 'active' : ''
+              }" id="chatlist">채팅</li>
+              <li class="tab ${
+                active === 'likelist' ? 'active' : ''
+              }" id="likelist">관심목록</li>
+              <div class="pin"></div>
+            </ul>
+          </nav>
+        </div>
         <div class="list-wrapper"></div>
       </div>
     `;
@@ -60,121 +53,22 @@ class Menu extends Component {
   setup() {
     this.$state = {
       active: 'salelist',
+      childClass: {
+        salelist: MyProduct,
+        chatlist: ChatList,
+        likelist: MyLike,
+      },
     };
   }
+  pinMove() {
+    const pin = this.$target.querySelector('.pin');
+    const active = this.$target.querySelector('.active');
+    const tabList = this.$target.querySelector('.tab-list');
+    const pinLeft = tabList.getBoundingClientRect().left;
+    const activeLeft = active.getBoundingClientRect().left;
 
-  getList(url, active) {
-    api.fetchWithToken(url).then((res) => {
-      if (res.ok) {
-        if (active === 'salelist' || active === 'likelist') {
-          this.store.dispatch('setProducts', res.result);
-        } else if (active === 'chatlist') {
-          this.store.dispatch('setRooms', res.rooms);
-        }
-        this.setState({ active });
-      }
-    });
+    pin.style.transform = `translate3d(${activeLeft - pinLeft}px, 50%, 0)`;
   }
-
-  handleTabClick(e) {
-    const { active } = this.$state;
-    if (!e.target.closest('.menu-tab-wrapper .tab')) return;
-    if (active === e.target.id) return;
-
-    let url = '';
-    const clicked = e.target.id;
-
-    if (clicked === 'salelist') {
-      url = combineWithQueryString(`${BASE_URL}/product/mine`, {
-        page: this.store.getState('page'),
-      });
-    } else if (clicked === 'chatlist') {
-      url = `${BASE_URL}/chat`;
-    } else if (clicked === 'likelist') {
-      url = `${BASE_URL}/like`;
-    }
-
-    this.getList(url, clicked);
-  }
-
-  getItem(url, active) {
-    let action = '';
-    let next = '';
-
-    if (active === 'salelist' || active === 'likelist') {
-      action = 'setCurrentProduct';
-      // next = `/product/${item.id}`;
-      next = `/product`;
-    } else if (active === 'chatlist') {
-      action = 'setCurrentChatInfo';
-      // next = `/chat/${item.id}`;
-      next = `/chatDetail`;
-    }
-    api.fetchWithToken(url).then((res) => {
-      if (res.ok) {
-        if (active === 'salelist' || active === 'likelist') {
-          this.store.dispatch(action, res.result);
-        } else if (active === 'chatlist') {
-          const { messages, product } = res;
-          const chatInfo = this.store.getState('chatInfo');
-          this.store.dispatch(action, { messages, product, ...chatInfo });
-        }
-        $router.push(next);
-      }
-    });
-  }
-
-  handleOptionClick(e) {
-    if (!e.target.closest('.list-wrapper .option')) return;
-
-    const $optionMenu = e.target.closest('.option').previousElementSibling;
-    if ($optionMenu.classList.contains('hidden')) {
-      $optionMenu.classList.remove('hidden');
-    } else {
-      $optionMenu.classList.add('hidden');
-    }
-  }
-
-  handleSaleItemClick(e) {
-    if (e.target.closest('.list-wrapper .option')) return;
-    if (!e.target.closest('.product-list .list-item')) return;
-
-    const item = e.target.closest('.list-wrapper .list-item');
-    const url = `${BASE_URL}/product/${item.id}`;
-    const { active } = this.$state;
-    this.getItem(url, active);
-  }
-
-  handleChatRoomClick(e) {
-    if (!e.target.closest('.chat-list .list-item')) return;
-
-    const item = e.target.closest('.list-wrapper .list-item');
-    const sender = item.querySelector('.sender-name').textContent;
-    const url = `${BASE_URL}/chat/${item.id}`;
-    const { active } = this.$state;
-
-    this.setChatConnection(item.id);
-
-    this.store.dispatch('setCurrentChatInfo', {
-      room: item.id,
-      chatTarget: sender,
-    });
-    this.getItem(url, active);
-  }
-
-  handleLikeItemClick(e) {
-    if (!e.target.closest('.product-list .list-item')) return;
-
-    const item = e.target.closest('.list-wrapper .list-item');
-    const url = `${BASE_URL}/product/${item.id}`;
-    const { active } = this.$state;
-    this.getItem(url, active);
-  }
-
-  setChatConnection(room) {
-    socket.emit('joinRoom', { room });
-  }
-
   mounted() {
     const $navbar = this.$target.querySelector('.navbar-wrapper');
     new NavBar(
@@ -182,55 +76,34 @@ class Menu extends Component {
       { title: '메뉴', background: 'grey', border: 'no-border' },
       this.store
     );
-    const { active } = this.$state;
-    const children = [
-      {
-        childClass: MenuTab,
-        selector: '.menu-tab-wrapper',
-        props: {
-          eventTarget: '.menu-wrapper',
-          active,
-          onClick: this.handleTabClick.bind(this),
-        },
-      },
-    ];
-
-    if (active === 'salelist') {
-      children.push({
-        childClass: ProductList,
-        selector: '.list-wrapper',
-        props: {
-          eventTarget: '.menu-wrapper',
-          active,
-          listType: 'with-menu',
-          emptyMesage: '등록한 상품이 없습니다.',
-          onClick: this.handleSaleItemClick.bind(this),
-          onOptionClick: this.handleOptionClick.bind(this),
-        },
-      });
-    } else if (active === 'chatlist') {
-      children.push({
-        childClass: ChatList,
-        selector: '.list-wrapper',
-        props: {
-          eventTarget: '.menu-wrapper',
-          active,
-          onClick: this.handleChatRoomClick.bind(this),
-        },
-      });
-    } else if (active === 'likelist') {
-      children.push({
-        childClass: ProductList,
-        selector: '.list-wrapper',
-        props: {
-          eventTarget: '.menu-wrapper',
-          active,
-          listType: 'no-menu',
-          emptyMesage: '관심을 표시한 상품이 없습니다.',
-          onClick: this.handleLikeItemClick.bind(this),
-        },
-      });
-    }
-    this.childReRender(children);
+    this.pinMove();
+    setTimeout(() => {
+      this.$target.querySelector('.pin').style.transition = `0.3s`;
+    }, 0);
+    const { active, childClass } = this.$state;
+    new childClass[active](
+      this.$target.querySelector('.list-wrapper'),
+      {},
+      this.store
+    );
+  }
+  setEvent() {
+    this.addEvent('click', '.tab', (e) => {
+      let current = e.target;
+      while (!current.classList.contains('tab')) {
+        current = current.parentNode;
+      }
+      this.$target.querySelector('.active').classList.remove('active');
+      current.classList.add('active');
+      this.pinMove();
+      const id = current.getAttribute('id');
+      this.$state.active = id;
+      const { childClass } = this.$state;
+      new childClass[id](
+        this.$target.querySelector('.list-wrapper'),
+        {},
+        this.store
+      );
+    });
   }
 }
