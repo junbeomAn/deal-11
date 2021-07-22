@@ -35,7 +35,9 @@ class NavBar extends Component {
         ${
           right
             ? `
-            <button class="nav-bar-btn ${right === 'done' ? 'done' : 'exit'}">
+            <button class="nav-bar-btn right-btn ${
+              right === 'done' ? 'done' : 'exit'
+            }">
               <img src=${right === 'done' ? doneIcon : exitIcon} alt="next">
             </button>
           `
@@ -53,6 +55,6 @@ class NavBar extends Component {
     this.handleBackClick = this.handleBackClick.bind(this);
     this.addEvent('click', '.nav-bar-shared', this.handleBackClick);
     if (handleRightClick)
-      this.addEvent('click', '.nav-bar-shared', handleRightClick);
+      this.addEvent('click', '.nav-bar-shared.right-btn', handleRightClick);
   }
 }
