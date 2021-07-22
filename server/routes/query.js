@@ -97,7 +97,14 @@ const selectMyProductQuery = () => {
   returnQuery += ` WHERE a.user_id = ? GROUP BY a.id ORDER BY a.created_at DESC`;
   return returnQuery;
 };
-
+const updateUserLocationQuery = (userId, locations) => {
+  const locationArg = locations.slice();
+  if (locationArg.length === 1) {
+    locationArg.push('NULL');
+  }
+  return `UPDATE USERS SET location_1_id = ${locationArg[0]}, location_2_id = ${locationArg[1]}
+  WHERE id = ${userId};`;
+};
 module.exports = {
   searchLocationQuery,
   insertLocationQuery,
@@ -127,4 +134,5 @@ module.exports = {
   selectChatRoomDetailQuery,
   selectProductForChatQuery,
   updateReadMessageQuery,
+  updateUserLocationQuery,
 };
