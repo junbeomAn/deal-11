@@ -19,6 +19,7 @@ const {
   selectProductListQuery,
   selectCategoryItemsQuery,
   selectMyProductQuery,
+  selectMyLikeQuery,
 } = require('../query.js');
 const { NotExtended } = require('http-errors');
 
@@ -68,6 +69,10 @@ router.get('/mine', runAsyncWrapper(async (req, res, next) => {
 
 router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
   const { productId } = req.params;
+  if (isNaN(parseInt(productId))){
+    next();
+    return;
+  }
   const { id } = await new Promise((resolve, reject) => {
     const { token } = req.headers;
     const SECRET_KEY = process.env.COOKIE_SECRET;
@@ -192,6 +197,19 @@ router.post('/like/:productId', runAsyncWrapper(async (req, res, next) => {
     }
   } catch(err) {
     next(createError(+err.message));
+  }
+
+}));
+router.get('/like', runAsyncWrapper(async (req, res, next) => {
+  try{
+    const myinfo = await requiredLoginDecorator(req, next);
+
+    const { id } = myinfo;
+
+    const [result] = await pool.execute(selectMyLikeQuery(id));
+    res.send({ok: true, result});
+  } catch(err) {
+    next(err);
   }
 
 }));

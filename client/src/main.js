@@ -9,6 +9,7 @@ import ChatDetail from './component/Chat/ChatDetail.js';
 import Animation from './component/animation';
 import Post from './component/post';
 import Detail from './component/detail';
+import Location from './component/location';
 
 import './scss/app.scss';
 import store from './store';
@@ -38,6 +39,7 @@ const routes = [
   { path: '/menu', component: Menu, middleware: loginMiddleWare },
   { path: '/chatDetail', component: ChatDetail, middleware: loginMiddleWare },
   { path: '/post', component: Post, middleware: loginMiddleWare },
+  { path: '/location', component: Location, middleware: loginMiddleWare },
 ];
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
