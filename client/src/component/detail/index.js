@@ -235,7 +235,10 @@ class Heart extends Component {
   }
   setEvent() {
     this.addEvent('click', 'svg', (e) => {
-      if (!this.store.getState('isLogin')) $router.redirect('/signin');
+      if (!this.store.getState('isLogin')) {
+        $router.redirect('/signin');
+        return;
+      }
       const svg = this.$target.querySelector('svg');
       const { id } = this.$props;
       const url = API_ENDPOINT + `/api/v1/product/like/${id}`;
