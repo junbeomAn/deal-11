@@ -55,6 +55,6 @@ class NavBar extends Component {
     this.handleBackClick = this.handleBackClick.bind(this);
     this.addEvent('click', '.nav-bar-shared', this.handleBackClick);
     if (handleRightClick)
-      this.addEvent('click', '.nav-bar-shared.right-btn', handleRightClick);
+      this.addEvent('click', '.nav-bar-shared .right-btn', handleRightClick);
   }
 }
