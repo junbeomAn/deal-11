@@ -132,7 +132,12 @@ class Location extends Component {
     if ($modal.classList.contains('hidden')) {
       $modal.classList.remove('hidden');
     } else {
-      $modal.classList.add('hidden');
+      const $box = this.$target.querySelector('.modal');
+      $box.classList.add('close');
+      setTimeout(() => {
+        $modal.classList.add('hidden');
+        $box.classList.remove('close');
+      }, 300);
     }
   }
 
