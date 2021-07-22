@@ -2,25 +2,7 @@ import Component from '../../core/Component';
 
 export default class ChatBubbleList extends Component {
   template() {
-    const bubbles = [
-      {
-        content: '안녕하세요 ~',
-        read: 0,
-        fromId: 0,
-      },
-      {
-        content: '방가워요 ㅎ',
-        read: 0,
-        fromId: 0,
-      },
-      {
-        content: '저기요?',
-        read: 0,
-        fromId: 3,
-      },
-    ];
-
-    // const { messages: bubbles } = this.store.getState('chatInfo')
+    const { messages: bubbles } = this.store.getState('chatInfo');
 
     return `
       <ul class="chat-bubble-list">
