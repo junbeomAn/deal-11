@@ -97,7 +97,22 @@ const selectMyProductQuery = () => {
   returnQuery += ` WHERE a.user_id = ? GROUP BY a.id ORDER BY a.created_at DESC`;
   return returnQuery;
 };
-
+const updateUserLocationQuery = (userId, locations) => {
+  const locationArg = locations.slice();
+  if (locationArg.length === 1) {
+    locationArg.push('NULL');
+  }
+  return `UPDATE USERS SET location_1_id = ${locationArg[0]}, location_2_id = ${locationArg[1]}
+  WHERE id = ${userId};`;
+};
+const selectMyLikeQuery = (userId) => {
+  return `
+  SELECT P.id, P.title, P.created_at, P.image_url, P.price, 
+  (SELECT COUNT(*) FROM USER_LIKE_PRODUCT WHERE product_id = P.id) AS like_count,
+  (SELECT name FROM LOCATIONS WHERE id = P.location_id) AS location, 
+  (SELECT COUNT(*) FROM CHAT_ROOMS WHERE product_id = P.id) AS chat_count
+  FROM PRODUCTS AS P, USER_LIKE_PRODUCT AS U WHERE U.user_id = ${userId} AND U.product_id = P.id`;
+};
 module.exports = {
   searchLocationQuery,
   insertLocationQuery,
@@ -127,4 +142,6 @@ module.exports = {
   selectChatRoomDetailQuery,
   selectProductForChatQuery,
   updateReadMessageQuery,
+  updateUserLocationQuery,
+  selectMyLikeQuery,
 };
