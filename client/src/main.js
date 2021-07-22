@@ -97,6 +97,9 @@ $app.addEventListener('route', () => {
 $app.addEventListener('scroll', () => {
   scrollHandler();
 });
+$app.addEventListener('append', () => {
+  setScrollBar();
+});
 function init() {
   promise(API_ENDPOINT + '/myinfo', 'GET')
     .then((res) => {

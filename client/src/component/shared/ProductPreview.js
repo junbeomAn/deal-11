@@ -1,5 +1,6 @@
 import Component from '../../core/Component';
 import { priceChange } from '../../utils';
+import { appendEvent } from '../../lib/event';
 import moment from 'moment';
 
 import empty from '../../assets/empty.jpeg';
@@ -31,5 +32,8 @@ export default class ProductPreview extends Component {
     virtualDOM.innerHTML = this.template();
     this.$target.append(...virtualDOM.children);
     this.mounted();
+  }
+  mounted() {
+    document.querySelector('#app').dispatchEvent(appendEvent);
   }
 }
