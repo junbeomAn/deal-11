@@ -35,7 +35,7 @@ const routes = [
   { path: '/category', component: Category },
   { path: '/menu', component: Menu, middleware: loginMiddleWare },
   { path: '/chatDetail', component: ChatDetail, middleware: loginMiddleWare },
-  { path: '/post', component: Post },
+  { path: '/post', component: Post, middleware: loginMiddleWare },
 ];
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
