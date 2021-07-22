@@ -1,6 +1,6 @@
 import Component from '../../core/Component';
 import NavBar from '../shared/NavBar';
-import { BASE_URL, combineWithQueryString } from '../../utils';
+import { combineWithQueryString } from '../../utils';
 import { $router } from '../../lib/router';
 
 import '../../scss/category.scss';
@@ -105,7 +105,7 @@ class CategoryContents extends Component {
     }
     console.log(location, qs.location);
     const url = combineWithQueryString(
-      `${BASE_URL}/product/category/${$item.id}`,
+      `${API_ENDPOINT}/api/v1/product/category/${$item.id}`,
       qs
     );
 

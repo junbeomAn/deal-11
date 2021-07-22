@@ -40,7 +40,10 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      API_ENDPOINT: JSON.stringify('http://localhost:3000'),
+      API_ENDPOINT:
+        process.env.NODE_ENV === 'development'
+          ? JSON.stringify('http://localhost:3000')
+          : JSON.stringify(process.env.PRIVATE_DNS),
     }),
     new HtmlWebpackPlugin({
       template: './src/index.html',

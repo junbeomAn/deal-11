@@ -1,7 +1,6 @@
 import Component from '../../core/Component';
 import NavBar from '../shared/NavBar';
 import Button from '../shared/Button';
-import { BASE_URL } from '../../utils';
 
 import '../../scss/auth.scss';
 import { $router } from '../../lib/router';
@@ -81,7 +80,7 @@ class Content extends Component {
 
   handleLogout(e) {
     if (!e.target.closest('.button-wrapper button')) return;
-    const url = `${BASE_URL}/auth/signout`;
+    const url = `${API_ENDPOINT}/auth/signout`;
 
     this.removeToken();
     this.store.dispatch('setIsLogin', false);

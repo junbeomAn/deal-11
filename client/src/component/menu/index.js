@@ -5,7 +5,7 @@ import ProductList from './ProductList';
 import ChatList from './ChatList';
 
 import { $router } from '../../lib/router';
-import { BASE_URL, combineWithQueryString } from '../../utils';
+import { combineWithQueryString } from '../../utils';
 import socket from '../Chat/socket';
 
 import 'moment/locale/ko';
@@ -87,11 +87,11 @@ class Menu extends Component {
     const clicked = e.target.id;
 
     if (clicked === 'salelist') {
-      url = combineWithQueryString(`${BASE_URL}/product/mine`, {
+      url = combineWithQueryString(`${API_ENDPOINT}/api/v1/product/mine`, {
         page: this.store.getState('page'),
       });
     } else if (clicked === 'likelist') {
-      url = `${BASE_URL}/like`;
+      url = `${API_ENDPOINT}/api/v1/like`;
     }
 
     this.getList(url, clicked);
@@ -122,33 +122,16 @@ class Menu extends Component {
     if (!e.target.closest('.product-list .list-item')) return;
 
     const item = e.target.closest('.list-wrapper .list-item');
-    const url = `${BASE_URL}/product/${item.id}`;
+    const url = `${API_ENDPOINT}/api/v1/product/${item.id}`;
     const { active } = this.$state;
     this.getItem(url, active);
   }
-
-  // handleChatRoomClick(e) {
-  //   if (!e.target.closest('.chat-list .list-item')) return;
-
-  //   const item = e.target.closest('.list-wrapper .list-item');
-  //   const sender = item.querySelector('.sender-name').textContent;
-  //   const url = `${BASE_URL}/chat/${item.id}`;
-  //   const { active } = this.$state;
-
-  //   this.setChatConnection(item.id);
-
-  //   this.store.dispatch('setCurrentChatInfo', {
-  //     room: item.id,
-  //     chatTarget: sender,
-  //   });
-  //   this.getItem(url, active);
-  // }
 
   handleLikeItemClick(e) {
     if (!e.target.closest('.product-list .list-item')) return;
 
     const item = e.target.closest('.list-wrapper .list-item');
-    const url = `${BASE_URL}/product/${item.id}`;
+    const url = `${API_ENDPOINT}/api/v1/product/${item.id}`;
     const { active } = this.$state;
     this.getItem(url, active);
   }

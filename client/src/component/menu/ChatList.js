@@ -1,6 +1,5 @@
 import Component from '../../core/Component';
 import moment from 'moment';
-import { BASE_URL } from '../../utils';
 import promise from '../../lib/api';
 import socket from '../Chat/socket';
 
@@ -118,7 +117,9 @@ class ChatList extends Component {
             </div>
           </div>
           <div class="image-box">
-            <img src="${BASE_URL}${imageUrl[0]}" alt="product-image" />
+            <img src="${API_ENDPOINT}/api/v1${
+      imageUrl[0]
+    }" alt="product-image" />
           </div>
         </div>`;
   }

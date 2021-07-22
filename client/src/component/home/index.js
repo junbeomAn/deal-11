@@ -9,7 +9,6 @@ import accountI from '../../assets/account.svg';
 import menuI from '../../assets/menu.svg';
 import locationI from '../../assets/location.svg';
 import '../../scss/home.scss';
-import { BASE_URL } from '../../utils';
 
 const api = {
   getToken: function () {
@@ -106,7 +105,7 @@ class Home extends Component {
       ]);
       this.store.dispatch('setProductFilter', '');
     } else {
-      const url = `${BASE_URL}/product`;
+      const url = `${API_ENDPOINT}/api/v1/product`;
       api.fetch(url).then((res) => {
         this.store.dispatch('setProducts', res.result);
         this.childReRender([
@@ -120,7 +119,7 @@ class Home extends Component {
                 if (!e.target.closest('.product-list .list-item')) return;
 
                 const item = e.target.closest('.list-wrapper .list-item');
-                const url = `${BASE_URL}/product/${item.id}`;
+                const url = `${API_ENDPOINT}/api/v1/product/${item.id}`;
                 api.fetch(url).then((res) => {
                   this.store.dispatch('setCurrentProduct', res.result);
                   $router.push('/product');
@@ -216,7 +215,7 @@ class Home extends Component {
       if (!e.target.closest('img')) return;
       if (!this.store.getState('isLogin')) return;
 
-      const url = `${BASE_URL}/product/mine?page=1`;
+      const url = `${API_ENDPOINT}/api/v1/product/mine?page=1`;
       api.fetchWithToken(url).then((res) => {
         if (res.ok) {
           this.store.dispatch('setProducts', res.result);
