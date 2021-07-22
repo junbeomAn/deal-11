@@ -73,8 +73,9 @@ const selectProductDetailQuery = (user) => {
   return returnQuery;
 };
 const whereLocation = (location) => {
-  let returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location, COUNT(c.product_id) AS like_count FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id=b.id`;
-  returnQuery += ` LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id=a.id`;
+  let returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location, COUNT(c.product_id) AS like_count, COUNT(CHAT_ROOMS.id) AS chat_count 
+  FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id=b.id`;
+  returnQuery += ` LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id=a.id LEFT JOIN CHAT_ROOMS ON CHAT_ROOMS.product_id = a.id `;
   if (location) returnQuery += ` WHERE b.name = '${location}'`;
   return returnQuery;
 };
