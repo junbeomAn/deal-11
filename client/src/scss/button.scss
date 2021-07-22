@@ -44,4 +44,10 @@ button {
   &.text-small {
     font-size: $text-small;
   }
+  &:disabled {
+    background-color: #bbe7e6 !important;
+    &:hover {
+      cursor: default !important;
+    }
+  }
 }

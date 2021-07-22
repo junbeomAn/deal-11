@@ -189,6 +189,20 @@ class Home extends Component {
         return;
       }
     });
+    this.addEvent('click', '.product-list-wrapper', (e) => {
+      if (
+        document.querySelector('.toggle-menu') &&
+        !document.querySelector('.toggle-menu').classList.contains('off')
+      )
+        return;
+      if (!e.target.closest('.product-preview-wrapper')) return;
+      let current = e.target;
+      while (!current.classList.contains('product-preview-wrapper')) {
+        current = current.parentNode;
+      }
+      this.store.setState('productId', current.dataset.pid);
+      $router.push('/product', 3);
+    });
 
     this.addEvent('click', '.menu-btn', (e) => {
       if (!e.target.closest('img')) return;

@@ -1,0 +1,204 @@
+@import 'theme';
+
+.detail-wrapper {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+
+  > .nav-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    background-color: white;
+    justify-content: space-between;
+
+    > div:not(.authorized-toggle-menu) {
+      position: relative;
+      z-index: 5;
+      padding: 0.5rem;
+      color: white;
+      font-size: 1.5rem;
+      mix-blend-mode: difference;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    > .authorized-toggle-menu {
+      display: none;
+      position: relative;
+      z-index: 5;
+      background-color: #f0f0f0;
+      position: absolute;
+      top: 0.5rem;
+      right: 40px;
+      border-radius: 6px;
+      > * {
+        padding: 1rem;
+        &:nth-child(2) {
+          border-top: 1px solid $placeholder-grey;
+          color: $danger;
+        }
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+    &.toggle-on {
+      > .authorized-toggle-menu {
+        display: block;
+      }
+    }
+  }
+
+  > .carousel-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    &:after {
+      content: '';
+      position: relative;
+      transition: 0.5s;
+      z-index: 4;
+      display: block;
+      background: linear-gradient(#333, white, #333);
+      opacity: 0;
+      padding-bottom: 100%;
+    }
+    &:hover {
+      &:after {
+        opacity: 0.2;
+      }
+      > .carou-btn {
+        opacity: 1;
+      }
+    }
+    > img {
+      transition: 0.5s;
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+    }
+    > .carou-btn {
+      position: absolute;
+      top: 50%;
+      transform: translate3d(0, -50%, 0);
+      mix-blend-mode: difference;
+      color: white;
+      font-size: 1.5rem;
+      z-index: 5;
+      opacity: 0;
+      &.carou-left {
+        left: 0.5rem;
+      }
+      &.carou-right {
+        right: 0.5rem;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    > .circle-wrapper {
+      position: absolute;
+      z-index: 5;
+      bottom: 0.5rem;
+      left: 50%;
+      transform: translate3d(-50%, 0, 0);
+      display: flex;
+      justify-content: center;
+
+      > .circle {
+        width: 10px;
+        height: 10px;
+        border: 3px solid white;
+        mix-blend-mode: difference;
+        border-radius: 5px;
+        transition: 0.5s;
+        margin: 0 3px;
+        &.long {
+          width: 20px;
+          background-color: white;
+        }
+      }
+    }
+  }
+  > .product-info {
+    padding: 1rem;
+
+    > h2 {
+      font-size: 1.2rem;
+      margin: 0.5em 0;
+    }
+    .sub-info {
+      font-size: 0.8rem;
+      color: $content-grey;
+    }
+    > .content {
+      margin: 1.5rem 0;
+    }
+    > .seller-info {
+      padding: 1rem;
+      background-color: #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1.5rem 0;
+      border-radius: 6px;
+      p {
+        font-weight: bold;
+      }
+      > .real {
+        gap: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+  > .bottom-nav {
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    border-top: solid 1px $line-grey;
+    display: flex;
+    align-items: center;
+
+    > .heart-wrapper {
+      padding: 0.5rem;
+      border-right: solid 1px $line-grey;
+      > svg {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        fill: white;
+        transition: 0.5s;
+
+        &.fill {
+          fill: red;
+        }
+        &:hover {
+          cursor: pointer;
+        }
+        path {
+          stroke-width: 3;
+          stroke: red;
+        }
+      }
+    }
+    > .price-chat-wrapper {
+      width: 80%;
+      padding: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 auto;
+    }
+  }
+}

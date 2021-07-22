@@ -9,6 +9,7 @@ class Store {
     products: [],
     user: {},
     rooms: [],
+    productId: 0,
     categoryId: 0,
     filter: '',
   };

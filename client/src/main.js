@@ -8,6 +8,7 @@ import Menu from './component/menu';
 import ChatDetail from './component/Chat/ChatDetail.js';
 import Animation from './component/animation';
 import Post from './component/post';
+import Detail from './component/detail';
 
 import './scss/app.scss';
 import store from './store';
@@ -33,6 +34,7 @@ const routes = [
   { path: '/signin', component: SignIn },
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
+  { path: '/product', component: Detail, middleware: detailRoutingMiddelWare },
   { path: '/menu', component: Menu, middleware: loginMiddleWare },
   { path: '/chatDetail', component: ChatDetail, middleware: loginMiddleWare },
   { path: '/post', component: Post, middleware: loginMiddleWare },
@@ -44,6 +46,14 @@ let remainScroll = 0;
 let scrollRange = 0;
 let scrollTimeOut = null;
 
+function detailRoutingMiddelWare() {
+  if (!store.getState('productId')) {
+    $router.redirect('/home');
+    return false;
+  } else {
+    return true;
+  }
+}
 function loginMiddleWare() {
   if (!store.getState('isLogin')) {
     $router.redirect('/signin');
