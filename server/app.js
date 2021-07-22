@@ -27,7 +27,7 @@ app.use(express.static('public'));
 app.use(
   cors({
     credentials: true,
-    origin: 'http://127.0.0.1:5500',
+    origin: process.env.PRIVATE_DNS || 'http://127.0.0.1:5500',
   })
 );
 
