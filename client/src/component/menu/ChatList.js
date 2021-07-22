@@ -68,7 +68,7 @@ export default class ChatListWrapper extends Component {
       chatTarget: sender,
     });
     this.saveChatItem = this.saveChatItem.bind(this);
-    api.fetchWithToken(url, 'GET').then(this.saveChatItem);
+    promise(url, 'GET').then(this.saveChatItem);
   }
 
   mounted() {
