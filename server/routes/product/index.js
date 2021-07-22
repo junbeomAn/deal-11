@@ -100,37 +100,34 @@ router.get('/:productId', runAsyncWrapper(async (req, res, next) => {
   }
 }));
 
-router.put('/:productId', runAsyncWrapper(async (req, res, next) => {
+
+router.put('/:productId', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
   try {
     const myinfo = await requiredLoginDecorator(req, next);
-  
     const { productId } = req.params;
+    const { title, content, price, category_id, keep } = JSON.parse(req.body.data);
     const { id } = myinfo;
-    const arguments = [id, productId];
-    const [check] = await pool.execute(selectIsAuthorized, arguments);
+    const firstArguments = [id, productId];
+    const [check] = await pool.execute(selectIsAuthorized, firstArguments);
     if (check[0].authorized) {
       const images = parseImageUrlStringToArray(check[0].image_url);
       images.forEach(img => {
-        fs.unlinkSync(appPublic + img);
+        if(!keep.includes(img)) fs.unlinkSync(appPublic + img);
       })
-      next();
+      
     } else {
       next(createError(401, '수정 권한 없음'));
     }
+
+    const image_url = makeImageUrlString(keep) + makeImageUrlString(req.files);
+    const arguments = [title, content, image_url, price, category_id, productId];
+
+    const [result] = await pool.execute(updateProductQuery, arguments);
+    res.send({ ok: true });
   } catch(err) {
     next(createError(+err.message));
   }
   
-}));
-router.put('/:productId', upload.array('product-images'), runAsyncWrapper(async (req, res, next) => {
-  const { productId } = req.params;
-  const { title, content, price, location } = JSON.parse(req.body.data);
-  const image_url = makeImageUrlString(req.files);
-  const location_id = await selectOrInsertLocation(location);
-  const arguments = [title, content, image_url, price, location_id, productId];
-
-  const [result] = await pool.execute(updateProductQuery, arguments);
-  res.send({ ok: true });
 }));
 
 router.delete('/:productId', runAsyncWrapper(async (req, res, next) => {
@@ -206,7 +203,8 @@ router.get('/like', runAsyncWrapper(async (req, res, next) => {
 
     const { id } = myinfo;
 
-    const [result] = await pool.execute(selectMyLikeQuery(id));
+    const [products] = await pool.execute(selectMyLikeQuery(id));
+    const result = getProductsWithImageUrlArray(products)
     res.send({ok: true, result});
   } catch(err) {
     next(err);

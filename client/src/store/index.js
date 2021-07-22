@@ -12,6 +12,7 @@ class Store {
     productId: 0,
     categoryId: 0,
     filter: '',
+    putPost: null,
   };
   actions = {
     loginTrue: () => {
