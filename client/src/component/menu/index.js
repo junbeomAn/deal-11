@@ -64,12 +64,14 @@ class Menu extends Component {
   }
 
   getList(url, active) {
+    if (active === 'chatlist') {
+      this.setState({ active });
+      return;
+    }
     api.fetchWithToken(url).then((res) => {
       if (res.ok) {
         if (active === 'salelist' || active === 'likelist') {
           this.store.dispatch('setProducts', res.result);
-        } else if (active === 'chatlist') {
-          this.store.dispatch('setRooms', res.rooms);
         }
         this.setState({ active });
       }
@@ -88,8 +90,6 @@ class Menu extends Component {
       url = combineWithQueryString(`${BASE_URL}/product/mine`, {
         page: this.store.getState('page'),
       });
-    } else if (clicked === 'chatlist') {
-      url = `${BASE_URL}/chat`;
     } else if (clicked === 'likelist') {
       url = `${BASE_URL}/like`;
     }
@@ -98,28 +98,10 @@ class Menu extends Component {
   }
 
   getItem(url, active) {
-    let action = '';
-    let next = '';
-
-    if (active === 'salelist' || active === 'likelist') {
-      action = 'setCurrentProduct';
-      // next = `/product/${item.id}`;
-      next = `/product`;
-    } else if (active === 'chatlist') {
-      action = 'setCurrentChatInfo';
-      // next = `/chat/${item.id}`;
-      next = `/chatDetail`;
-    }
     api.fetchWithToken(url).then((res) => {
       if (res.ok) {
-        if (active === 'salelist' || active === 'likelist') {
-          this.store.dispatch(action, res.result);
-        } else if (active === 'chatlist') {
-          const { messages, product } = res;
-          const chatInfo = this.store.getState('chatInfo');
-          this.store.dispatch(action, { messages, product, ...chatInfo });
-        }
-        $router.push(next);
+        this.store.dispatch('setCurrentProduct', res.result);
+        $router.push('/product');
       }
     });
   }
@@ -145,22 +127,22 @@ class Menu extends Component {
     this.getItem(url, active);
   }
 
-  handleChatRoomClick(e) {
-    if (!e.target.closest('.chat-list .list-item')) return;
+  // handleChatRoomClick(e) {
+  //   if (!e.target.closest('.chat-list .list-item')) return;
 
-    const item = e.target.closest('.list-wrapper .list-item');
-    const sender = item.querySelector('.sender-name').textContent;
-    const url = `${BASE_URL}/chat/${item.id}`;
-    const { active } = this.$state;
+  //   const item = e.target.closest('.list-wrapper .list-item');
+  //   const sender = item.querySelector('.sender-name').textContent;
+  //   const url = `${BASE_URL}/chat/${item.id}`;
+  //   const { active } = this.$state;
 
-    this.setChatConnection(item.id);
+  //   this.setChatConnection(item.id);
 
-    this.store.dispatch('setCurrentChatInfo', {
-      room: item.id,
-      chatTarget: sender,
-    });
-    this.getItem(url, active);
-  }
+  //   this.store.dispatch('setCurrentChatInfo', {
+  //     room: item.id,
+  //     chatTarget: sender,
+  //   });
+  //   this.getItem(url, active);
+  // }
 
   handleLikeItemClick(e) {
     if (!e.target.closest('.product-list .list-item')) return;
@@ -212,11 +194,6 @@ class Menu extends Component {
       children.push({
         childClass: ChatList,
         selector: '.list-wrapper',
-        props: {
-          eventTarget: '.menu-wrapper',
-          active,
-          onClick: this.handleChatRoomClick.bind(this),
-        },
       });
     } else if (active === 'likelist') {
       children.push({
