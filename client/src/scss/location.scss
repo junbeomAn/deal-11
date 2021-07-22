@@ -1,0 +1,111 @@
+@import 'theme.scss';
+@import 'size.scss';
+
+$button-height: 50px;
+$button-width: 190px;
+
+$modal-width: 380px;
+$modal-height: 180px;
+
+.location-select-wrapper {
+  min-height: 100vh;
+  position: relative;
+  .location-content {
+    .info-box {
+      text-align: center;
+      font-size: $text-medium;
+      color: $content-grey;
+      margin: 40px 0;
+    }
+    .button-box {
+      display: flex;
+      justify-content: space-around;
+      margin: 10px 20px;
+      button.location {
+        border-radius: $button-radius;
+        height: $button-height;
+        min-width: $button-width;
+        &.active {
+          display: flex;
+          justify-content: space-around;
+          align-items: center;
+        }
+        &.location-one {
+          background-color: #2ac1bc;
+          .location-name {
+            color: #fff;
+            font-size: $text-large;
+          }
+          .delete-button {
+            color: $baemin-secondary;
+            font-size: 20px;
+          }
+        }
+        &.location-two {
+          background-color: #fff;
+          border: 1px solid $baemin-primary;
+          color: $baemin-primary;
+          .location-name {
+            color: $baemin-third;
+            font-size: $text-large;
+          }
+          .delete-button {
+            color: $baemin-secondary;
+            font-size: 20px;
+          }
+          .plus-button {
+            font-size: $text-large;
+            height: 100%;
+          }
+        }
+      }
+    }
+    .error-message {
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      &.hidden {
+        display: none;
+      }
+    }
+  }
+}
+
+.location-add-modal-wrapper {
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.703);
+  z-index: 5;
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  top: 0;
+  &.hidden {
+    display: none;
+  }
+  .modal {
+    background-color: $off-white;
+    width: $modal-width;
+    height: $modal-height;
+    border-radius: $button-radius;
+    z-index: 10;
+    padding: 20px 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    .input {
+      width: 310px;
+    }
+    .button-wrapper {
+      display: flex;
+      justify-content: space-between;
+      .cancel {
+        color: black;
+      }
+      .confirm {
+        color: $content-grey;
+      }
+    }
+  }
+}

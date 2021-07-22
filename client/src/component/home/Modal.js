@@ -46,6 +46,9 @@ class Modal extends Component {
         if (e.target.closest('.post')) {
           $router.push('/post', 3);
         }
+        if (e.target.closest('.mycity')) {
+          $router.push('/location', 3);
+        }
       }
     });
   }
