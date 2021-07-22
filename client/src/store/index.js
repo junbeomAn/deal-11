@@ -2,13 +2,15 @@ class Store {
   states = {
     isLogin: false,
     homeModal: false,
-    location: ['동네', '옆 동네'],
+    selected: 0,
     inputValue: '',
     isLoading: false,
     page: 1,
     products: [],
     user: {},
     rooms: [],
+    productId: 0,
+    categoryId: 0,
     filter: '',
   };
   actions = {

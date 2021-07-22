@@ -8,9 +8,11 @@ import Menu from './component/menu';
 import ChatDetail from './component/Chat/ChatDetail.js';
 import Animation from './component/animation';
 import Post from './component/post';
+import Detail from './component/detail';
 
 import './scss/app.scss';
 import store from './store';
+import promise from './lib/api';
 
 /**
  * route
@@ -32,9 +34,10 @@ const routes = [
   { path: '/signin', component: SignIn },
   { path: '/signup', component: SignUp },
   { path: '/category', component: Category },
+  { path: '/product', component: Detail, middleware: detailRoutingMiddelWare },
   { path: '/menu', component: Menu, middleware: loginMiddleWare },
   { path: '/chatDetail', component: ChatDetail, middleware: loginMiddleWare },
-  { path: '/post', component: Post },
+  { path: '/post', component: Post, middleware: loginMiddleWare },
 ];
 const $app = document.querySelector('#app');
 const scrollBar = document.querySelector('#custom-scroll-bar');
@@ -43,6 +46,14 @@ let remainScroll = 0;
 let scrollRange = 0;
 let scrollTimeOut = null;
 
+function detailRoutingMiddelWare() {
+  if (!store.getState('productId')) {
+    $router.redirect('/home');
+    return false;
+  } else {
+    return true;
+  }
+}
 function loginMiddleWare() {
   if (!store.getState('isLogin')) {
     $router.redirect('/signin');
@@ -52,6 +63,7 @@ function loginMiddleWare() {
   }
 }
 function setScrollBar() {
+  document.querySelector('#app').removeAttribute('style');
   const pageRootElem = document.querySelector('#app > *');
   if (!pageRootElem) return;
   const { height } = pageRootElem.getBoundingClientRect();
@@ -85,7 +97,25 @@ $app.addEventListener('route', () => {
 $app.addEventListener('scroll', () => {
   scrollHandler();
 });
-async function init() {
-  initRouter({ $app, routes, store });
+$app.addEventListener('append', () => {
+  setScrollBar();
+});
+function init() {
+  promise(API_ENDPOINT + '/myinfo', 'GET')
+    .then((res) => {
+      const isLogin = res.login;
+      store.dispatch('setIsLogin', isLogin);
+      if (isLogin) {
+        const { location, username } = res.myinfo;
+        store.dispatch('setUserInfo', {
+          username,
+          location,
+        });
+      }
+      initRouter({ $app, routes, store });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 init();

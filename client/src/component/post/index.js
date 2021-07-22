@@ -1,7 +1,10 @@
 import Component from '../../core/Component';
 import NavBar from '../shared/NavBar';
 
+import promise from '../../lib/api';
+import { priceChange, getPriceOriginal, categoryInfo } from '../../utils';
 import '../../scss/post.scss';
+import { $router } from '../../lib/router';
 
 export default class PostWrapper extends Component {
   template() {
@@ -21,22 +24,33 @@ class Post extends Component {
       <div class="nav-bar-wrapper"></div>
       <div class="form-wrapper">
         <form class="post-form">
+          <p class="form-error-message hidden"></p>
           <div class="file-upload-wrapper">
             <label class="custom-file-upload">
               <input type="file" id="file-upload" name="file-upload" accept="image/*" multiple="multiple">
               <div class="img"><i class="far fa-image"></i></div>
-              <div class="file-count"><span>${this.$state.files.length}</span>/10</div>
+              <div class="file-count"><span>${
+                this.$state.files.length
+              }</span>/10</div>
             </label>
             <div class="image-preview-list"></div>
           </div>
           <label>
-            <input type="text" id="title" name="title" placeholder="글 제목">
+            <input type="text" id="title" name="title" placeholder="(필수)글 제목">
+          </label>
+          <label class="category">
+            <p>(필수)카테고리를 선택해주세요.</p>
+            <select id="category" name="category">
+              ${categoryInfo.reduce((prev, category, idx) => {
+                return prev + `<option value="${idx + 1}">${category}</option>`;
+              }, '<option value="0" disabled selected="true">선택해 주십시오.</option>')}
+            </select>
           </label>
           <label>
             <input type="text" id="price" name="price" placeholder="₩ 가격(선택사항)">
           </label>
           <label>
-            <textarea id="content" name="content" placeholder="게시글 내용을 작성해주세요."></textarea>
+            <textarea id="content" name="content" placeholder="(필수)게시글 내용을 작성해주세요."></textarea>
           </label>
         </form>
         <div class="location-wrapper">
@@ -48,7 +62,8 @@ class Post extends Component {
   }
   setup() {
     this.$state = {
-      location: '방이동',
+      location:
+        this.store.getState('user').location[this.store.getState('selected')],
       formData: new FormData(),
       files: [],
     };
@@ -56,7 +71,56 @@ class Post extends Component {
   mounted() {
     new NavBar(
       this.$target.querySelector('.nav-bar-wrapper'),
-      { title: '글쓰기' },
+      {
+        title: '글쓰기',
+        right: 'done',
+        handleRightClick: (e) => {
+          const form = this.$target.querySelector('.post-form');
+          const errorWrapper = form.querySelector('.form-error-message');
+          errorWrapper.classList.add('hidden');
+          if (!form.title.value.replace(/ /g, '').length) {
+            errorWrapper.innerText = '글 제목은 필수 사항 입니다.';
+            errorWrapper.classList.remove('hidden');
+            return;
+          }
+          if (form.category.value === '0') {
+            errorWrapper.innerText = '카테고리는 필수 사항 입니다.';
+            errorWrapper.classList.remove('hidden');
+            return;
+          }
+          if (form.price.value === '올바른 가격이 아닙니다.') {
+            errorWrapper.innerText = '올바른 가격을 입력하십시오.';
+            errorWrapper.classList.remove('hidden');
+            return;
+          }
+          if (!form.content.value.replace(/ /g, '').length) {
+            errorWrapper.innerText = '게시글 내용은 필수 사항 입니다.';
+            errorWrapper.classList.remove('hidden');
+            return;
+          }
+          let price = getPriceOriginal(form.price.value);
+          if (price === '') price = -1;
+          const data = {
+            title: form.title.value,
+            content: form.content.value,
+            category_id: parseInt(form.category.value),
+            price: parseInt(price),
+            location: this.$state.location,
+          };
+          this.$state.formData.append('data', JSON.stringify(data));
+          const url = API_ENDPOINT + '/api/v1/product';
+          promise(url, 'POST', {}, this.$state.formData, true)
+            .then((res) => {
+              if (res.ok) {
+                this.store.setState('productId', parseInt(res.detail_id));
+                $router.redirect('/product');
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        },
+      },
       this.store
     );
     this.$target
@@ -91,6 +155,9 @@ class Post extends Component {
           });
         }
       });
+    this.$target.querySelector('#price').addEventListener('change', (e) => {
+      e.target.value = priceChange(e.target.value);
+    });
   }
   shouldComponentUpdate(prevState, nextState) {
     if (prevState.files.length !== nextState.files.length) {

@@ -1,9 +1,13 @@
 import Component from '../../core/Component';
+import promise from '../../lib/api';
+import { $router } from '../../lib/router';
+
+import '../../scss/togglemenu.scss';
 
 export default class ToggleMenuWrapper extends Component {
   template() {
     return `
-      <div class="toggle-menu">
+      <div class="toggle-menu off">
       </div>
     `;
   }
@@ -17,9 +21,32 @@ export default class ToggleMenuWrapper extends Component {
 }
 class ToggleMenu extends Component {
   template() {
+    const buttonHTML = this.$props.location.reduce((prev, location, idx) => {
+      return (
+        prev +
+        `<button class="reload-btn menu-item" data-selected="${idx}">${location}</button>`
+      );
+    }, '');
+
     return `
-      <button class="reload-btn">${this.$props.location}</button>
-      <button class="add-location-btn">내 동네 설정하기</button>
+      ${buttonHTML}
+      <button class="add-location-btn menu-item">내 동네 설정하기</button>
     `;
+  }
+  setEvent() {
+    this.addEvent('click', '.add-location-btn', () => {
+      promise(API_ENDPOINT + '/myinfo', 'GET')
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+    this.addEvent('click', '.reload-btn', (e) => {
+      const selected = e.target.dataset.selected;
+      this.store.setState('selected', selected);
+      $router.redirect('/home');
+    });
   }
 }

@@ -65,16 +65,17 @@ const selectExistRoomQuery = (productId, userId, toId) => {
 const selectProductDetailQuery = (user) => {
   const user_id = user.userId;
   let returnQuery = `
-  SELECT a.id, a.title, a.content, e.username AS seller_name, e.id AS seller_id, a.image_url, a.created_at, a.price, b.name AS location, IF(COUNT(c.user_id)>0, true, false) AS user_like, IF(a.user_id=${user_id}, true, false) AS authorized
-  , d.name AS category
+  SELECT a.id, a.title, a.content, e.username AS seller_name, e.id AS seller_id, a.image_url, a.created_at, a.price, b.name AS location, IF(EXISTS(SELECT * FROM USER_LIKE_PRODUCT WHERE user_id=${user_id} AND product_id = a.id), true, false) AS user_like, 
+  IF(a.user_id=${user_id}, true, false) AS authorized, d.name AS category, COUNT(CHAT_ROOMS.id) AS chat_count, COUNT(c.id) AS like_count 
   FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id = b.id INNER JOIN CATEGORIES AS d ON d.id = a.category_id INNER JOIN USERS AS e ON e.id = a.user_id 
-  LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id = a.id AND c.user_id = ${user_id} 
+  LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id = a.id LEFT JOIN CHAT_ROOMS ON CHAT_ROOMS.product_id = a.id 
   WHERE a.id = ? GROUP BY a.id`;
   return returnQuery;
 };
 const whereLocation = (location) => {
-  let returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location, COUNT(c.product_id) AS like_count FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id=b.id`;
-  returnQuery += ` LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id=a.id`;
+  let returnQuery = `SELECT a.id, a.title, a.created_at, a.image_url, a.price, b.name AS location, COUNT(c.product_id) AS like_count, COUNT(CHAT_ROOMS.id) AS chat_count 
+  FROM PRODUCTS AS a INNER JOIN LOCATIONS AS b ON a.location_id=b.id`;
+  returnQuery += ` LEFT JOIN USER_LIKE_PRODUCT AS c ON c.product_id=a.id LEFT JOIN CHAT_ROOMS ON CHAT_ROOMS.product_id = a.id `;
   if (location) returnQuery += ` WHERE b.name = '${location}'`;
   return returnQuery;
 };
@@ -93,7 +94,7 @@ const selectCategoryItemsQuery = (location, category_id) => {
 };
 const selectMyProductQuery = () => {
   let returnQuery = whereLocation();
-  returnQuery += ` WHERE a.user_id = ? GROUP BY a.id ORDER BY a.created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
+  returnQuery += ` WHERE a.user_id = ? GROUP BY a.id ORDER BY a.created_at DESC`;
   return returnQuery;
 };
 

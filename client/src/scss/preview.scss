@@ -1,0 +1,42 @@
+@import 'theme';
+
+.product-preview-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 1rem;
+  &:hover {
+    cursor: pointer;
+    background-color: #eee;
+  }
+  > img {
+    width: 130px;
+    height: 130px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-right: 1rem;
+  }
+  > .product-info {
+    > * {
+      margin-bottom: 0.6rem;
+    }
+    > .title {
+      width: 170px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    > .location.time {
+      color: $content-grey;
+    }
+  }
+  > .like-count {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    color: $content-grey;
+  }
+}

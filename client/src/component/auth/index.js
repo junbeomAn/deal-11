@@ -81,10 +81,10 @@ class Content extends Component {
 
   handleLogout(e) {
     if (!e.target.closest('.button-wrapper button')) return;
-    const url = `${BASE_URL}/auth/signout`;
 
     this.removeToken();
     this.store.dispatch('setIsLogin', false);
+    this.store.dispatch('setUserInfo', {});
     $router.push('/signin');
     // api._signOut(url).then((res) => {
     //   if (res.ok) {

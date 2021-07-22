@@ -56,8 +56,7 @@ router.get('/mine', runAsyncWrapper(async (req, res, next) => {
   try{
     const myinfo = await requiredLoginDecorator(req, next);
     const { id } = myinfo;
-    const { page = 1 } = req.query;
-    const arguments = [id, String((page-1)*10)];
+    const arguments = [id];
     
     const [products] = await pool.execute(selectMyProductQuery(), arguments);
     const result = getProductsWithImageUrlArray(products);

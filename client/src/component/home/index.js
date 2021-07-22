@@ -2,34 +2,15 @@ import Component from '../../core/Component';
 import { $router } from '../../lib/router';
 import Modal from './Modal';
 import ToggleMenu from './ToggleMenu';
-import ProductList from '../menu/ProductList';
+import ProductPreview from '../shared/ProductPreview';
+import promise from '../../lib/api';
 
 import categoryI from '../../assets/category.svg';
 import accountI from '../../assets/account.svg';
 import menuI from '../../assets/menu.svg';
 import locationI from '../../assets/location.svg';
+import emptyImage from '../../assets/empty.jpeg';
 import '../../scss/home.scss';
-import { BASE_URL } from '../../utils';
-
-const api = {
-  getToken: function () {
-    return localStorage.getItem('token');
-  },
-  fetchWithToken: function (url) {
-    return fetch(url, {
-      headers: {
-        token: this.getToken(),
-      },
-    })
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
-  },
-  fetch: function (url) {
-    return fetch(url)
-      .then((res) => res.json())
-      .catch((err) => console.error(err));
-  },
-};
 
 export default class HomeWrapper extends Component {
   template() {
@@ -38,11 +19,31 @@ export default class HomeWrapper extends Component {
     `;
   }
   mounted() {
-    new Home(
-      this.$target.querySelector('.home-wrapper'),
-      this.$props,
-      this.store
-    );
+    let url = API_ENDPOINT + '/api/v1/product';
+    const categoryId = this.store.getState('categoryId');
+    if (categoryId) url += `/category/${categoryId}`;
+    if (this.store.getState('isLogin')) {
+      url += `?location=${
+        this.store.getState('user').location[this.store.getState('selected')]
+      }`;
+    }
+    promise(url, 'GET')
+      .then((res) => {
+        if (res.ok) {
+          new Home(
+            document.querySelector('.home-wrapper'),
+            {
+              products: res.result,
+            },
+            this.store
+          );
+        } else {
+          return new Error(res);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
@@ -64,7 +65,6 @@ class Home extends Component {
           <button class="menu-btn"><img src=${menuI}></button>
         </div>
       </nav>
-      <div class="nav-occupant"></div>
       <div class="product-list-wrapper"></div>
       <button class="plus-btn">
         <svg viewBox="0 0 100 100">
@@ -76,8 +76,22 @@ class Home extends Component {
     `;
   }
   mounted() {
-    const user = this.store.getState('user');
-    const text = user.username ? user.location[0] : '로그인 해주세요';
+    const text = this.$state.login
+      ? this.store.getState('user').location[this.store.getState('selected')]
+      : '로그인 해주세요';
+    const productListElem = this.$target.querySelector('.product-list-wrapper');
+    if (this.$props.products.length) {
+      this.$props.products.forEach((product) => {
+        new ProductPreview(productListElem, product, this.store);
+      });
+    } else {
+      const emptyElem = document.createElement('img');
+      const emptyText = document.createElement('p');
+      emptyText.innerText = '물건이 아직 없네요.';
+      emptyElem.src = emptyImage;
+      productListElem.classList.add('not-product');
+      productListElem.append(emptyElem, emptyText);
+    }
     this.childReRender([
       {
         childClass: Location,
@@ -88,55 +102,25 @@ class Home extends Component {
         },
       },
     ]);
-    /**
-     * 만약 필터 있으면 그냥 렌더링 및 필터 지움, 없으면 데이터 요청 후 렌더링.
-     */
-    const filter = this.store.getState('filter');
-    if (filter) {
+    if (this.$state.login) {
       this.childReRender([
         {
-          childClass: ProductList,
-          selector: '.product-list-wrapper',
+          childClass: ToggleMenu,
+          selector: '.toggle-menu-wrapper',
           props: {
-            listType: '',
-            emptyMessage: '등록된 상품이 없습니다',
-            onClick: () => {},
+            location: this.store.getState('user').location,
           },
         },
       ]);
-      this.store.dispatch('setProductFilter', '');
-    } else {
-      const url = `${BASE_URL}/product`;
-      api.fetch(url).then((res) => {
-        this.store.dispatch('setProducts', res.result);
-        this.childReRender([
-          {
-            childClass: ProductList,
-            selector: '.product-list-wrapper',
-            props: {
-              listType: '',
-              emptyMessage: '등록된 상품이 없습니다',
-              onClick: (e) => {
-                if (!e.target.closest('.product-list .list-item')) return;
-
-                const item = e.target.closest('.list-wrapper .list-item');
-                const url = `${BASE_URL}/product/${item.id}`;
-                api.fetch(url).then((res) => {
-                  this.store.dispatch('setCurrentProduct', res.result);
-                  $router.push('/product');
-                });
-              },
-            },
-          },
-        ]);
-      });
     }
+  }
+  shouldComponentUpdate(prevState, nextState) {
+    return false;
   }
   setup() {
     this.store.dispatch('modalChange', false);
     this.$state = {
       login: this.store.getState('isLogin'),
-      location: this.store.getState('location')[0],
     };
   }
   setEvent() {
@@ -157,12 +141,14 @@ class Home extends Component {
       }
       if (prevModalOn) {
         this.$target.querySelector('.modal > div').classList.add('down');
+        document.querySelector('#app').removeAttribute('style');
         setTimeout(() => {
           modal.classList.remove('on');
           while (modal.hasChildNodes()) modal.removeChild(modal.lastChild);
         }, 300);
       } else {
         modal.classList.add('on');
+        document.querySelector('#app').style.overflow = 'hidden';
         this.childReRender([
           {
             childClass: Modal,
@@ -172,52 +158,61 @@ class Home extends Component {
       }
     });
 
-    this.addEvent('click', '.location-btn', () => {
-      const toggleMenuWrapper = this.$target.querySelector(
-        '.toggle-menu-wrapper'
-      );
-      const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
-      if (this.$state.login && !toggleMenu) {
-        this.childReRender([
-          {
-            childClass: ToggleMenu,
-            selector: '.toggle-menu-wrapper',
-            props: {
-              location: this.$state.location,
-            },
-          },
-        ]);
-      } else if (this.$state.login && toggleMenu) {
-        toggleMenu.classList.add('off');
-        setTimeout(() => {
-          while (toggleMenuWrapper.hasChildNodes()) {
-            toggleMenuWrapper.removeChild(toggleMenuWrapper.lastChild);
-          }
-        }, 300);
+    this.addEvent(
+      'click',
+      '.location-btn',
+      (e) => {
+        const toggleMenuWrapper = this.$target.querySelector(
+          '.toggle-menu-wrapper'
+        );
+        const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
+        if (this.$state.login && toggleMenu.classList.contains('off')) {
+          e.stopPropagation();
+          toggleMenu.classList.remove('off');
+          const toggleMenuButtons = [...toggleMenu.children];
+          const menuHeight = toggleMenuButtons.reduce((sum, child) => {
+            const { height } = child.getBoundingClientRect();
+            return sum + height;
+          }, 0);
+          toggleMenu.style.height = `${menuHeight}px`;
+        }
+      },
+      true
+    );
+    this.addEvent('click', '.home-wrapper', (e) => {
+      if (e.target.closest('.toggle-menu-wrapper')) return;
+      if (
+        document.querySelector('.toggle-menu') &&
+        !document.querySelector('.toggle-menu').classList.contains('off')
+      ) {
+        this.toggleMenuOff();
+        return;
       }
     });
-
-    this.addEvent('click', '.home-wrapper', (e) => {
-      const toggleMenuWrapper = this.$target.querySelector(
-        '.toggle-menu-wrapper'
-      );
-      const toggleMenu = toggleMenuWrapper.querySelector('.toggle-menu');
-      if (!e.target.closest('.center') && toggleMenu) {
-        toggleMenu.classList.add('off');
-        setTimeout(() => {
-          while (toggleMenuWrapper.hasChildNodes()) {
-            toggleMenuWrapper.removeChild(toggleMenuWrapper.lastChild);
-          }
-        }, 300);
+    this.addEvent('click', '.product-list-wrapper', (e) => {
+      if (
+        document.querySelector('.toggle-menu') &&
+        !document.querySelector('.toggle-menu').classList.contains('off')
+      )
+        return;
+      if (!e.target.closest('.product-preview-wrapper')) return;
+      let current = e.target;
+      while (!current.classList.contains('product-preview-wrapper')) {
+        current = current.parentNode;
       }
+      this.store.setState('productId', current.dataset.pid);
+      $router.push('/product', 3);
     });
 
     this.addEvent('click', '.menu-btn', (e) => {
       if (!e.target.closest('img')) return;
-      if (!this.store.getState('isLogin')) return;
+      if (!this.store.getState('isLogin')) {
+        $router.push('/signin', 1);
+        return;
+      }
 
-      const url = `${BASE_URL}/product/mine?page=1`;
-      api.fetchWithToken(url).then((res) => {
+      const url = API_ENDPOINT + `/api/v1/product/mine`;
+      promise(url, 'GET').then((res) => {
         if (res.ok) {
           this.store.dispatch('setProducts', res.result);
           $router.push('/menu', 1);
@@ -225,22 +220,12 @@ class Home extends Component {
       });
     });
   }
-
-  shouldComponentUpdate(prevState, nextState) {
-    if (prevState.login !== nextState.login) {
-      const text = nextState.login ? nextState.location : '로그인 해주세요';
-      this.childReRender([
-        {
-          childClass: Location,
-          selector: '.location-btn',
-          props: {
-            login: nextState.login,
-            text,
-          },
-        },
-      ]);
-    }
-    return false;
+  toggleMenuOff() {
+    const toggleMenu = this.$target.querySelector('.toggle-menu');
+    toggleMenu.style.height = `0px`;
+    setTimeout(() => {
+      toggleMenu.classList.add('off');
+    }, 400);
   }
 }
 
