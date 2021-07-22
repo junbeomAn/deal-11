@@ -51,9 +51,6 @@ class ChatDetail extends Component {
                 price
               )}원</span>
             </div>
-            <div class="sale-status">
-              ${status}
-            </div>
           </div>
         </div>
       </div>
