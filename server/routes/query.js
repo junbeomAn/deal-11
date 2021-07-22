@@ -11,7 +11,7 @@ const locationIdQuery = `SELECT id FROM LOCATIONS WHERE NAME = ?`;
 const insertProductQuery = `INSERT INTO PRODUCTS(title, content, user_id, category_id, image_url, price, location_id) VALUES(?, ?, ?, ?, ?, ?, ?)`;
 const deleteLikeQuery = `DELETE FROM USER_LIKE_PRODUCT WHERE user_id=? AND product_id=?`;
 const insertLikeQuery = `INSERT INTO USER_LIKE_PRODUCT(user_id, product_id) VALUES (?, ?)`;
-const updateProductQuery = `UPDATE PRODUCTS SET title = ?, content = ?, image_url = ?, price = ?, location_id = ? WHERE id = ?`;
+const updateProductQuery = `UPDATE PRODUCTS SET title = ?, content = ?, image_url = ?, price = ?, category_id = ? WHERE id = ?`;
 const deleteProductQuery = `DELETE FROM PRODUCTS WHERE id = ?`;
 const selectIsAuthorized = `SELECT IF(user_id = ?, 1, 0) AS authorized, image_url FROM PRODUCTS WHERE id = ?`;
 const selectChatRoomValidQuery = `SELECT IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS isSeller, IF(EXISTS(SELECT id FROM PRODUCTS WHERE user_id = ? AND id = ?), 1, 0) AS sellerHas`;

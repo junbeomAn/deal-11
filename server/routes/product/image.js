@@ -41,7 +41,7 @@ const makeImageUrlString = (files = []) => {
   let image_url = '';
 
   files.forEach((file) => {
-    image_url += `/images/${file.filename};`;
+    image_url += file.filename ? `/images/${file.filename};` : `${file};`;
   });
   return image_url;
 };
