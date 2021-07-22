@@ -54,7 +54,7 @@
       padding: 18px 20px;
       display: flex;
       &.mine {
-        justify-content: flex-start;
+        justify-content: flex-end;
         .bubble-item {
           padding: 10px;
           width: max-content;
@@ -63,7 +63,7 @@
         }
       }
       &.opponent {
-        justify-content: flex-end;
+        justify-content: flex-start;
         .bubble-item {
           padding: 10px;
           width: max-content;

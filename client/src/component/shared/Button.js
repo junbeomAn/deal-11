@@ -1,6 +1,6 @@
 import Component from '../../core/Component';
 
-import '../../scss/Button.scss';
+import '../../scss/button.scss';
 
 export default class Button extends Component {
   template() {
