@@ -69,6 +69,10 @@ class CategoryContents extends Component {
         `
         );
       }, '')}
+        <li class="category-item" data-cid="${0}">
+          <div class="image-box"></div>
+          <div class="item-name">전체보기</div>
+        </li>
       </ul>
     `;
   }
@@ -81,7 +85,7 @@ class CategoryContents extends Component {
       current = current.parentNode;
     }
     const categoryId = current.dataset.cid;
-    this.store.setState('categoryId', categoryId);
+    this.store.setState('categoryId', parseInt(categoryId));
     $router.redirect('/home');
   }
   setEvent() {
