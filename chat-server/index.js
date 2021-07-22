@@ -5,7 +5,7 @@ dotenv.config();
 
 const io = require('socket.io')(http, {
   cors: {
-    origin: process.env.PRIVATE_DNS || 'http://127.0.0.1:5500',
+    origin: process.env.PUBLIC_DNS || 'http://127.0.0.1:5500',
     method: ['GET', 'POST'],
     credentials: true,
   },

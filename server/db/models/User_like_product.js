@@ -1,16 +1,16 @@
 module.exports = {
-  tableName: 'User_like_product',
+  tableName: 'USER_LIKE_PRODUCT',
   attributes: {
     user_id: ['INTEGER', 'NOT NULL'],
     product_id: ['INTEGER', 'NOT NULL'],
   },
   associate: {
     user_id: {
-      ref: 'Users',
+      ref: 'USERS',
       target: 'id',
     },
     product_id: {
-      ref: 'Products',
+      ref: 'PRODUCTS',
       target: 'id',
     },
   },

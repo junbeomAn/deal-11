@@ -1,5 +1,5 @@
 module.exports = {
-  tableName: 'Locations',
+  tableName: 'LOCATIONS',
   attributes: {
     name: ['VARCHAR(100)', 'NOT NULL', 'UNIQUE'],
   },

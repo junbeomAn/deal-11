@@ -1,5 +1,5 @@
 module.exports = {
-  tableName: 'Users',
+  tableName: 'USERS',
   attributes: {
     username: ['VARCHAR(20)', 'NOT NULL', 'UNIQUE'],
     location_1_id: ['INTEGER', 'NOT NULL'],
@@ -7,11 +7,11 @@ module.exports = {
   },
   associate: {
     location_1_id: {
-      ref: 'Locations',
+      ref: 'LOCATIONS',
       target: 'id',
     },
     location_2_id: {
-      ref: 'Locations',
+      ref: 'LOCATIONS',
       target: 'id',
     },
   },

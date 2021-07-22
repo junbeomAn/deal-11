@@ -6,17 +6,6 @@ import socket from '../Chat/socket';
 import '../../scss/chatlist.scss';
 import { $router } from '../../lib/router';
 
-const api = {
-  getToken: function () {
-    return localStorage.getItem('token');
-  },
-  fetchWithToken: function (url, method) {
-    return promise(url, 'GET', {
-      token: this.getToken(),
-    }).catch((err) => console.error(err));
-  },
-};
-
 export default class ChatListWrapper extends Component {
   template() {
     return `
@@ -32,24 +21,26 @@ export default class ChatListWrapper extends Component {
 
   getChatList() {
     const url = `${API_ENDPOINT}/api/v1/chat`;
-    api.fetchWithToken(url, 'GET').then((res) => {
-      const { rooms } = res;
-      this.store.dispatch('setRooms', rooms);
-      this.childReRender([
-        {
-          childClass: ChatList,
-          selector: '.chat-list',
-          props: {
-            rooms,
-            onClick: this.handleChatItemClick.bind(this),
+    promise(url, 'GET')
+      .then((res) => {
+        const { rooms } = res;
+        this.store.dispatch('setRooms', rooms);
+        this.childReRender([
+          {
+            childClass: ChatList,
+            selector: '.chat-list',
+            props: {
+              rooms,
+              onClick: this.handleChatItemClick.bind(this),
+            },
           },
-        },
-      ]);
-    });
+        ]);
+      })
+      .catch((err) => console.error(err));
   }
 
   setChatConnection(room) {
-    console.log('joinroom:', room);
+    // console.log('joinroom:', room);
     socket.emit('joinRoom', { room });
   }
 

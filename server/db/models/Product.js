@@ -1,5 +1,5 @@
 module.exports = {
-  tableName: 'Products',
+  tableName: 'PRODUCTS',
   attributes: {
     title: ['VARCHAR(200)', 'NOT NULL'],
     content: ['TEXT', 'NOT NULL'],
@@ -13,15 +13,15 @@ module.exports = {
   },
   associate: {
     user_id: {
-      ref: 'Users',
+      ref: 'USERS',
       target: 'id',
     },
     category_id: {
-      ref: 'Categories',
+      ref: 'CATEGORIES',
       target: 'id',
     },
     location_id: {
-      ref: 'Locations',
+      ref: 'LOCATIONS',
       target: 'id',
     },
   },

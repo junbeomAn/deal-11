@@ -1,5 +1,5 @@
 module.exports = {
-  tableName: 'Chat_rooms',
+  tableName: 'CHAT_ROOMS',
   attributes: {
     seller_id: ['INTEGER', 'NOT NULL'],
     buyer_id: ['INTEGER', 'NOT NULL'],
@@ -7,15 +7,15 @@ module.exports = {
   },
   associate: {
     seller_id: {
-      ref: 'Users',
+      ref: 'USERS',
       target: 'id',
     },
     buyer_id: {
-      ref: 'Users',
+      ref: 'USERS',
       target: 'id',
     },
     product_id: {
-      ref: 'Products',
+      ref: 'PRODUCTS',
       target: 'id',
     },
   },

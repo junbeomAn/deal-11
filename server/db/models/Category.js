@@ -1,10 +1,6 @@
 module.exports = {
-  tableName: "Categories",
+  tableName: 'CATEGORIES',
   attributes: {
-    name: [
-      "VARCHAR(20)",
-      "NOT NULL",
-      "UNIQUE",
-    ],
-  }
-}
+    name: ['VARCHAR(20)', 'NOT NULL', 'UNIQUE'],
+  },
+};

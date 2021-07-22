@@ -73,7 +73,6 @@ const categoryInfo = [
 export {
   isClass,
   isPromise,
-  BASE_URL,
   combineWithQueryString,
   priceChange,
   getPriceOriginal,

@@ -43,7 +43,9 @@ module.exports = {
       API_ENDPOINT:
         process.env.NODE_ENV === 'development'
           ? JSON.stringify('http://localhost:3000')
-          : JSON.stringify(process.env.PRIVATE_DNS),
+          : JSON.stringify(
+              'http://ec2-3-35-50-169.ap-northeast-2.compute.amazonaws.com:3000'
+            ),
     }),
     new HtmlWebpackPlugin({
       template: './src/index.html',

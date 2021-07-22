@@ -1,5 +1,5 @@
 module.exports = {
-  tableName: 'Messages',
+  tableName: 'MESSAGES',
   attributes: {
     chat_id: ['INTEGER', 'NOT NULL'],
     sender_id: ['INTEGER', 'NOT NULL'],
@@ -9,11 +9,11 @@ module.exports = {
   },
   associate: {
     chat_id: {
-      ref: 'Chat_rooms',
+      ref: 'CHAT_ROOMS',
       target: 'id',
     },
     sender_id: {
-      ref: 'Users',
+      ref: 'USERS',
       target: 'id',
     },
   },
