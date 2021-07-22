@@ -24,7 +24,7 @@ $baemin-error: #f45452;
   border-radius: 10px;
 }
 @mixin form-error-style($top) {
-  width: $large-width;
+  width: 100%;
   position: absolute;
   top: $top;
   font-size: 12px;

@@ -26,7 +26,7 @@ class NavBar extends Component {
   template() {
     const { title, right } = this.$props;
     return `
-        <button class="nav-bar-btn" >
+        <button class="nav-bar-btn back-btn" >
           <img src=${arrowIcon} alt="go-back">
         </button>
         <div class="title">
@@ -45,7 +45,7 @@ class NavBar extends Component {
     `;
   }
   handleBackClick(e) {
-    if (!e.target.closest('.nav-bar-btn')) return;
+    if (!e.target.closest('.nav-bar-btn.back-btn')) return;
     history.back();
   }
   setEvent() {

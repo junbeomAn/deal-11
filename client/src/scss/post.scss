@@ -1,4 +1,4 @@
-@import './theme.scss';
+@import 'theme';
 
 .post-wrapper {
   min-height: 100vh;
@@ -6,6 +6,7 @@
     margin-bottom: 50px;
   }
   .post-form {
+    position: relative;
     display: flex;
     flex-direction: column;
     margin: 0 1.5rem;
@@ -13,7 +14,10 @@
     input[type='file'] {
       display: none;
     }
-    > label:not(.custom-file-upload) {
+    > .form-error-message {
+      @include form-error-style(1.5rem);
+    }
+    > label:not(.custom-file-upload):not(.category) {
       padding: 1.5rem 0;
       border-top: 1px solid $placeholder-grey;
       display: flex;
@@ -37,7 +41,7 @@
       }
     }
     > .file-upload-wrapper {
-      padding: 1.5rem 0;
+      padding: 3rem 0 1.5rem 0;
       display: flex;
       align-items: center;
       width: 100%;
@@ -114,6 +118,24 @@
     border-top: 1px solid $placeholder-grey;
     > * {
       margin-right: 0.5em;
+    }
+  }
+  .category {
+    font-size: 1rem;
+    color: $content-grey;
+    padding: 1.5rem 0;
+    border-top: 1px solid $placeholder-grey;
+    > #category {
+      width: 100%;
+      padding: 0.5rem 0;
+      border: none;
+      margin-top: 0.5rem;
+      &:focus {
+        outline: none;
+      }
+      &:hover {
+        cursor: pointer;
+      }
     }
   }
 }

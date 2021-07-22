@@ -63,6 +63,7 @@ function loginMiddleWare() {
   }
 }
 function setScrollBar() {
+  document.querySelector('#app').removeAttribute('style');
   const pageRootElem = document.querySelector('#app > *');
   if (!pageRootElem) return;
   const { height } = pageRootElem.getBoundingClientRect();
