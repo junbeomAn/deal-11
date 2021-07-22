@@ -203,7 +203,8 @@ router.get('/like', runAsyncWrapper(async (req, res, next) => {
 
     const { id } = myinfo;
 
-    const [result] = await pool.execute(selectMyLikeQuery(id));
+    const [products] = await pool.execute(selectMyLikeQuery(id));
+    const result = getProductsWithImageUrlArray(products)
     res.send({ok: true, result});
   } catch(err) {
     next(err);
