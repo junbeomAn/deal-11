@@ -3,9 +3,14 @@
 
 $button-height: 50px;
 $button-width: 190px;
+$delete-button-width: 30px;
 
 $modal-width: 380px;
 $modal-height: 180px;
+$modal-input-width: 310px;
+
+$text-xxlarge: 30px;
+$text-xlarge: 20px;
 
 .location-select-wrapper {
   min-height: 100vh;
@@ -51,19 +56,25 @@ $modal-height: 180px;
           }
           .delete-button {
             color: $baemin-secondary;
-            font-size: 20px;
+            font-size: $text-xlarge;
+            width: $delete-button-width;
           }
           .plus-button {
-            font-size: $text-large;
+            font-size: $text-xxlarge;
             height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
         }
       }
     }
     .error-message {
-      top: 150px;
+      top: 260px;
       left: 50%;
       transform: translateX(-50%);
+      position: absolute;
+      color: $baemin-error;
       &.hidden {
         display: none;
       }
@@ -103,8 +114,11 @@ $modal-height: 180px;
       .cancel {
         color: black;
       }
-      .confirm {
+      .proceed {
         color: $content-grey;
+        &:hover {
+          color: $baemin-primary;
+        }
       }
     }
   }

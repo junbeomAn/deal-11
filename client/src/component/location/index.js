@@ -26,6 +26,8 @@ class Location extends Component {
   setEvent() {
     this.toggleModal = this.toggleModal.bind(this);
     this.addEvent('click', '.location-select-wrapper', this.toggleModal);
+    this.handleDeleteClick = this.handleDeleteClick.bind(this);
+    this.addEvent('click', '.button-box', this.handleDeleteClick);
   }
 
   template() {
@@ -80,9 +82,9 @@ class Location extends Component {
   }
 
   handleDeleteClick(e) {
-    const $delete = this.$target.querySelector('.delete-button');
-    if (e.target !== $delete) return;
+    if (!e.target.classList.contains('delete-button')) return;
 
+    const $delete = e.target;
     const user = this.store.getState('user');
     const location = user.location;
     if (location.length < 2) {
@@ -104,7 +106,7 @@ class Location extends Component {
       { location: newLocation }
     ).then((res) => {
       if (res.ok) {
-        const { token, ...userInfo } = res;
+        const { token, ...userInfo } = res.result;
         this.store.dispatch('setUserInfo', userInfo);
         this.saveToken(token);
         this.setState({ location: userInfo.location });
@@ -119,6 +121,7 @@ class Location extends Component {
     const $plus = this.$target.querySelector('.plus-button');
     const $cancel = this.$target.querySelector('.cancel');
     const $proceed = this.$target.querySelector('.proceed');
+    console.log($cancel === e.target);
     if (
       e.target !== $plus &&
       e.target !== $modal &&
@@ -126,7 +129,6 @@ class Location extends Component {
       e.target !== $proceed
     )
       return;
-
     if ($modal.classList.contains('hidden')) {
       $modal.classList.remove('hidden');
     } else {
@@ -150,7 +152,8 @@ class Location extends Component {
       { location: newLocation }
     ).then((res) => {
       if (res.ok) {
-        const { token, ...userInfo } = res;
+        const { token, ...userInfo } = res.result;
+        console.log(res, userInfo);
         this.store.dispatch('setUserInfo', userInfo);
         this.saveToken(token);
         this.setState({ location: userInfo.location });
@@ -170,7 +173,6 @@ class Location extends Component {
     new Modal(
       $modal,
       {
-        handleCancelClick: this.toggleModal.bind(this),
         handleProceedClick: this.handleLocationAdd.bind(this),
       },
       this.store
@@ -179,6 +181,11 @@ class Location extends Component {
 }
 
 class Modal extends Component {
+  setEvent() {
+    const { handleCancelClick, handleProceedClick } = this.$props;
+    this.addEvent('click', '.modal .proceed', handleProceedClick);
+  }
+
   template() {
     return `
       <div class="modal">
