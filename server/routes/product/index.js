@@ -27,13 +27,11 @@ const FETCH_COUNT = 10;
 
 // /product
 // '/' : 상품 전체 정보 가져오기
-// location, page 정보를 query로 받아와 상황에 맞게 응답한다.
 // location 없으면 그냥 전체 product 정보를 전달한다.
 router.get('/', runAsyncWrapper(async (req, res, next) => {
   try{
-    const { page = 1, location } = req.query;
-    const arguments = [String((page-1)*FETCH_COUNT)];
-    const [products] = await pool.execute(selectProductListQuery(location), arguments);
+    const { location } = req.query;
+    const [products] = await pool.execute(selectProductListQuery(location));
     const result = getProductsWithImageUrlArray(products);
     res.send({ ok: true, result });
   } catch(err) {
@@ -41,12 +39,11 @@ router.get('/', runAsyncWrapper(async (req, res, next) => {
   }
 }));
 
-router.get('/category/:category_id', runAsyncWrapper(async (req, res) => { // query: page, selected / params: category_name
-  const { page = 1, location } = req.query;
+router.get('/category/:category_id', runAsyncWrapper(async (req, res) => {
+  const { location } = req.query;
   const { category_id } = req.params;
-  const arguments = [String((page-1)*FETCH_COUNT)];
 
-  const [products] = await pool.execute(selectCategoryItemsQuery(location, category_id), arguments);
+  const [products] = await pool.execute(selectCategoryItemsQuery(location, category_id));
   const result = getProductsWithImageUrlArray(products);
 
   res.send({ ok: true, result });
