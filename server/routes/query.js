@@ -81,7 +81,7 @@ const whereLocation = (location) => {
 };
 const selectProductListQuery = (location) => {
   let returnQuery = whereLocation(location);
-  returnQuery += ` GROUP BY a.id ORDER BY a.created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
+  returnQuery += ` GROUP BY a.id ORDER BY a.created_at DESC`;
   return returnQuery;
 };
 const selectCategoryItemsQuery = (location, category_id) => {
@@ -89,7 +89,7 @@ const selectCategoryItemsQuery = (location, category_id) => {
   if (location) returnQuery += ` AND`;
   else returnQuery += ` WHERE`;
   returnQuery += ` a.category_id = ${category_id}`;
-  returnQuery += ` GROUP BY a.id ORDER BY a.created_at DESC LIMIT ${FETCH_COUNT} OFFSET ?`;
+  returnQuery += ` GROUP BY a.id ORDER BY a.created_at DESC`;
   return returnQuery;
 };
 const selectMyProductQuery = () => {
