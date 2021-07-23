@@ -10,11 +10,15 @@
   cursor: pointer;
   .image-box.small {
     display: flex;
-    align-items: center;
     max-width: 50px;
     height: 50px;
     border: 1px solid #d7d7d7;
     border-radius: 8px;
+    img {
+	border-radius: $button-radius;
+	max-width: 100%;
+    	max-height: 100%;
+    }
   }
   .info-box {
     align-content: center;
@@ -40,6 +44,7 @@
   height: 75vh;
   .chat-bubble-list {
     overflow: auto;
+    padding-bottom: 70px;
     .bubble-item-wrapper {
       padding: 18px 20px;
       display: flex;
